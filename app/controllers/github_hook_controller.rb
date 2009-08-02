@@ -9,7 +9,8 @@ class GithubHookController < ApplicationController
     identifier = payload['repository']['name']
     # For now, we assume that the repository name is the same as the project identifier
     project = Project.find_by_identifier(identifier)
-    raise ActiveRecord::RecordNotFound, "No project find with identifier '#{identifier}'" if project.nil? || project.repository.nil?
+    raise ActiveRecord::RecordNotFound, "No project found with identifier '#{identifier}'" if project.nil?
+    raise TypeError, "Project '#{identifier}' has no repository" if project.repository.nil?
     
     repository = project.repository
     raise TypeError, "Repository for project '#{identifier}' is not a Git repository" unless repository.is_a?(Repository::Git)
