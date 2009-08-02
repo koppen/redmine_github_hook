@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 require 'mocha'
 
-class GitHookControllerTest < ActionController::TestCase
+class GithubHookControllerTest < ActionController::TestCase
 
   def setup
     # Sample JSON post from http://github.com/guides/post-receive-hooks

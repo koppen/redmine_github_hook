@@ -1,4 +1,4 @@
-class GitHookController < ApplicationController
+class GithubHookController < ApplicationController
 
   def index
     # For now, we assume that the repository name is the same as the project identifier
