@@ -29,7 +29,8 @@ class GithubHookController < ApplicationController
   
   def exec(command)
     logger.info { "GithubHook: Executing command: '#{command}'" }
-    `#{command}`
+    output = `#{command}`
+    logger.info { "GithubHook: Shell returned '#{output}'" }
   end
 
 end
