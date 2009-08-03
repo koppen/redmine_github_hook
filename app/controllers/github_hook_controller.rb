@@ -19,6 +19,9 @@ class GithubHookController < ApplicationController
     command = "cd '#{repository.url}' && cd .. && git pull"
     exec(command)
 
+    # Fetch the new changesets into Redmine
+    Repository.fetch_changesets
+
     render(:text => 'OK')
   end
 
