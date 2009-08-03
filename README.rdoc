@@ -1,3 +1,66 @@
-= git_hook
+= Redmine Github Hook
 
-Description goes here
+This plugin allows you to update your local Git repositories in Redmine when changes have been pushed to Github.
+
+== Description
+
+Redmine has supported Git repositories for a long time, allowing you to browse your code and view your changesets directly in Redmine. For this purpose, Redmine relies on local clones of the Git repositories.
+
+If your shared repository is on a remote machine - for example on Github - this unfortunately means a bit of legwork to keep the local, Redmine-accessible repository up-to-date. The common approach is to set up a cronjob that pulls in any changes with regular intervals and updates Redmine with them.
+
+That approach works perfectly fine, but is a bit heavy-handed and cumbersome. The Redmine Github Hook plugin allows Github to notify your Redmine installation when changes have been pushed to a repository, triggering an update of your local repository and Redmine data only when it is actually necessary.
+
+
+== Installation
+
+1. Installing the plugin
+   1. Install the json gem <http://json.rubyforge.org/> on the machine where Redmine is running.
+   2. Follow the plugin installation procedure at http://www.redmine.org/wiki/redmine/Plugins.
+   3. Restart your Redmine.
+   4. If you already have a local Git repository set up and working from Redmine go to step 3, otherwise continue at step 2.
+
+2. Adding a Git repository to a project (note, this should works wether you want to use Redmine Github Hook or not)
+   1. Go to the directory on your Redmine machine where you want to keep your repository, for example /home/redmine/repositories/.
+   2. Get a clone of the repository into that location: git clone git://github.com/koppen/redmine_github_hook.git. This creates a .git directory at /home/redmine/repositories/redmine_github_hook/.git
+   3. Open Redmine in your browser and navigate to the Settings for the project you want to add a Git repository to.
+   4. Under the Repository tab, choose Git as your SCM and enter the full path to the .git directory from step 2; /home/redmine/repositories/redmine_github_hook/.git . Click "Create".
+   5. Click the new "Repository" link in the main navigation to verify that your repository integration works.
+
+3. Connecting Github to Redmine
+   1. Go to the repository Admin interface on Github.
+   2. Under "Service Hooks" add a new "Post-Receive URL" of the format: "[redmine_installation_url]/github_hook" (for example "http://example.com/github_hook").
+
+That's it. Github will now send a HTTP POST to the Redmine Github Hook plugin whenever changes are pushed to Github. The plugin then takes care of pulling the changes to the local repository and updating the Redmine database with them.
+
+
+== Assumptions
+
+* Your project identifier in Redmine is the same as the project name on Github.
+* Redmine 0.8 running on a *nix-like system.
+* Git available on the commandline.
+
+
+== License
+
+Copyright (c) 2009 Jakob Skjerning
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
