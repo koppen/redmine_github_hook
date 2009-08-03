@@ -46,12 +46,14 @@ class GithubHookControllerTest < ActionController::TestCase
       "after": "de8251ff97ee194a289832576287d6f8ad74e3d0",
       "ref": "refs/heads/master"
     }'
-    @project = Project.first
     @repository = Repository::Git.new
     @repository.stubs(:fetch_changesets).returns(true)
-    @project.expects(:repository).at_least(1).returns(@repository)
-    @controller.stubs(:exec)
+
+    @project = Project.new
+    @project.stubs(:repository).returns(@repository)
     Project.stubs(:find_by_identifier).with('github').returns(@project)
+    @controller.stubs(:exec)
+
     Repository.expects(:fetch_changesets).never
   end
 
