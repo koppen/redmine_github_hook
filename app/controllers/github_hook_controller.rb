@@ -16,7 +16,7 @@ class GithubHookController < ApplicationController
     raise TypeError, "Repository for project '#{identifier}' is not a Git repository" unless repository.is_a?(Repository::Git)
 
     # Get updates from the Github repository
-    command = "cd '#{repository.url}' && git pull"
+    command = "cd '#{repository.url}' && cd .. && git pull"
     exec(command)
 
     render(:text => 'OK')
@@ -25,7 +25,7 @@ class GithubHookController < ApplicationController
   private
   
   def exec(command)
-    logger.debug { "GitHook: Executing command: '#{command}'" }
+    logger.info { "GithubHook: Executing command: '#{command}'" }
     `#{command}`
   end
 
