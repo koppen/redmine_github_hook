@@ -48,9 +48,11 @@ class GithubHookControllerTest < ActionController::TestCase
     }'
     @project = Project.first
     @repository = Repository::Git.new
-    @project.stubs(:repository).returns(@repository)
+    @repository.stubs(:fetch_changesets).returns(true)
+    @project.expects(:repository).at_least(1).returns(@repository)
     @controller.stubs(:exec)
     Project.stubs(:find_by_identifier).with('github').returns(@project)
+    Repository.expects(:fetch_changesets).never
   end
 
   def do_post(payload = nil)
@@ -76,6 +78,13 @@ class GithubHookControllerTest < ActionController::TestCase
     assert_equal 'OK', @response.body
   end
 
+  def test_should_fetch_changesets_into_the_repository
+    @repository.expects(:fetch_changesets).returns(true)
+    do_post
+    assert_response :success
+    assert_equal 'OK', @response.body
+  end
+
   def test_should_return_404_if_project_not_found
     assert_raises ActiveRecord::RecordNotFound do
       Project.expects(:find_by_identifier).with('foobar').returns(nil)
@@ -83,8 +92,8 @@ class GithubHookControllerTest < ActionController::TestCase
     end
   end
 
-  def test_should_return_404_if_project_has_no_repository
-    assert_raises ActiveRecord::RecordNotFound do
+  def test_should_return_500_if_project_has_no_repository
+    assert_raises TypeError do
       project = mock('project')
       project.expects(:repository).returns(nil)
       Project.expects(:find_by_identifier).with('github').returns(project)

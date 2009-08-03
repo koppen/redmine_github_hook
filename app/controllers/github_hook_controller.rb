@@ -20,7 +20,7 @@ class GithubHookController < ApplicationController
     exec(command)
 
     # Fetch the new changesets into Redmine
-    Repository.fetch_changesets
+    repository.fetch_changesets
 
     render(:text => 'OK')
   end
