@@ -17,7 +17,7 @@ class GithubHookController < ApplicationController
     raise TypeError, "Repository for project '#{identifier}' is not a Git repository" unless repository.is_a?(Repository::Git)
 
     # Get updates from the Github repository
-    command = "cd '#{repository.url}' && cd .. && git pull"
+    command = "cd '#{repository.url}' && cd .. && git pull --rebase"
     exec(command)
 
     # Fetch the new changesets into Redmine
