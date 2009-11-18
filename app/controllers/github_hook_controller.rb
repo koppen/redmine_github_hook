@@ -2,6 +2,8 @@ require 'json'
 
 class GithubHookController < ApplicationController
 
+  skip_before_filter :verify_authenticity_token
+
   def index
     payload = JSON.parse(params[:payload])
     logger.debug { "Received from Github: #{payload.inspect}" }
