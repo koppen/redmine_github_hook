@@ -113,4 +113,9 @@ class GithubHookControllerTest < ActionController::TestCase
     end
   end
 
+  def test_should_not_require_login
+    @controller.expects(:check_if_login_required).never
+    do_post
+  end
+
 end
