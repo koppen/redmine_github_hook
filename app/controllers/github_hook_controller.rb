@@ -1,4 +1,5 @@
 require 'json'
+require 'open3'
 
 class GithubHookController < ApplicationController
 
@@ -19,7 +20,6 @@ class GithubHookController < ApplicationController
     raise TypeError, "Repository for project '#{identifier}' is not a Git repository" unless repository.is_a?(Repository::Git)
 
     # Get updates from the Github repository
-    #command = "cd '#{repository.url}' && cd .. && git pull --rebase"
     command = "cd '#{repository.url}' && git fetch origin && git reset --soft refs/remotes/origin/master"
     exec(command)
 
@@ -32,9 +32,19 @@ class GithubHookController < ApplicationController
   private
   
   def exec(command)
-    logger.info { "GithubHook: Executing command: '#{command}'" }
-    output = `#{command}`
-    logger.info { "GithubHook: Shell returned '#{output}'" }
+    logger.debug { "GithubHook: Executing command: '#{command}'" }
+    stdin, stdout, stderr = Open3.popen3(command)
+
+    output = stdout.readlines.collect(&:strip)
+    errors = stderr.readlines.collect(&:strip)
+
+    unless errors.empty?
+      error_message = []
+      error_message << "Error occurred running git"
+      error_message += errors
+      error_message += output
+      logger.error error_message
+    end
   end
 
 end
