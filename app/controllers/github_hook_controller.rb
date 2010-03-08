@@ -21,12 +21,13 @@ class GithubHookController < ApplicationController
 
     # Get updates from the Github repository
     command = "cd '#{repository.url}' && git fetch origin && git reset --soft refs/remotes/origin/master"
-    exec(command)
-
-    # Fetch the new changesets into Redmine
-    repository.fetch_changesets
-
-    render(:text => 'OK')
+    if exec(command)
+      # Fetch the new changesets into Redmine
+      repository.fetch_changesets
+      render(:text => 'OK')
+    else
+      render(:text => 'Failed', :status => 500)
+    end
   end
 
   private
@@ -38,12 +39,15 @@ class GithubHookController < ApplicationController
     output = stdout.readlines.collect(&:strip)
     errors = stderr.readlines.collect(&:strip)
 
-    unless errors.empty?
+    if errors.empty?
+      return true
+    else
       error_message = []
       error_message << "Error occurred running git"
       error_message += errors
       error_message += output
       logger.error error_message
+      return false
     end
   end
 
