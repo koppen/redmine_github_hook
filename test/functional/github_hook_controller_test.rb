@@ -147,17 +147,4 @@ class GithubHookControllerTest < ActionController::TestCase
     @controller.logger.expects(:error).never
     do_post
   end
-
-  def test_should_return_500_if_git_has_errors
-    @controller.expects(:exec).returns(false)
-    do_post
-    assert_response 500
-    assert_equal 'Failed', @response.body
-  end
-
-  def test_should_not_import_changeset_if_git_has_errors
-    @controller.expects(:exec).returns(false)
-    @repository.expects(:fetch_changesets).never
-    do_post
-  end
 end
