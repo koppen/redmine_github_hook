@@ -52,9 +52,17 @@ class GithubHookControllerTest < ActionController::TestCase
     @project = Project.new
     @project.stubs(:repository).returns(@repository)
     Project.stubs(:find_by_identifier).with('github').returns(@project)
-    @controller.stubs(:exec)
+
+    # Make sure we don't run actual commands in test
+    Open3.stubs(:popen3)
 
     Repository.expects(:fetch_changesets).never
+  end
+
+  def mock_descriptor(kind, contents = [])
+    descriptor = mock(kind)
+    descriptor.expects(:readlines).returns(contents)
+    descriptor
   end
 
   def do_post(payload = nil)
@@ -65,6 +73,7 @@ class GithubHookControllerTest < ActionController::TestCase
 
   def test_should_use_the_repository_name_as_project_identifier
     Project.expects(:find_by_identifier).with('github').returns(@project)
+    @controller.stubs(:exec).returns(true)
     do_post
   end
 
@@ -74,13 +83,21 @@ class GithubHookControllerTest < ActionController::TestCase
     do_post
   end
 
+  def test_should_use_project_identifier_from_request
+    Project.expects(:find_by_identifier).with('redmine').returns(@project)
+    @controller.stubs(:exec).returns(true)
+    post :index, :project_id => 'redmine', :payload => @json
+  end
+
   def test_should_render_ok_when_done
+    @controller.expects(:exec).returns(true)
     do_post
     assert_response :success
     assert_equal 'OK', @response.body
   end
 
   def test_should_fetch_changesets_into_the_repository
+    @controller.expects(:exec).returns(true)
     @repository.expects(:fetch_changesets).returns(true)
     do_post
     assert_response :success
@@ -114,7 +131,17 @@ class GithubHookControllerTest < ActionController::TestCase
   end
 
   def test_should_not_require_login
+    @controller.expects(:exec).returns(true)
     @controller.expects(:check_if_login_required).never
+    do_post
+  end
+
+  def test_exec_should_log_output_from_git_as_debug
+    stdout = mock_descriptor('STDOUT', ["output 1\n", "output 2\n"])
+    stderr = mock_descriptor('STDERR', ["error 1\n", "error 2\n"])
+    Open3.expects(:popen3).returns(['STDIN', stdout, stderr])
+
+    @controller.logger.expects(:debug).at_least(4)
     do_post
   end
 
