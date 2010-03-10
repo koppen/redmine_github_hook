@@ -38,13 +38,9 @@ class GithubHookController < ApplicationController
     output = stdout.readlines.collect(&:strip)
     errors = stderr.readlines.collect(&:strip)
 
-    unless errors.empty?
-      error_message = []
-      error_message << "Error occurred running git"
-      error_message += errors
-      error_message += output
-      logger.error error_message
-    end
+    logger.debug { "GithubHook: Output from git:" }
+    logger.debug { "GithubHook:  * STDOUT: #{output}"}
+    logger.debug { "GithubHook:  * STDERR: #{output}"}
   end
 
 end

@@ -130,21 +130,13 @@ class GithubHookControllerTest < ActionController::TestCase
     do_post
   end
 
-  def test_exec_should_log_errors_from_git
+  def test_exec_should_log_output_from_git_as_debug
     stdout = mock_descriptor('STDOUT', ["output 1\n", "output 2\n"])
     stderr = mock_descriptor('STDERR', ["error 1\n", "error 2\n"])
     Open3.expects(:popen3).returns(['STDIN', stdout, stderr])
 
-    @controller.logger.expects(:error).with(['Error occurred running git', 'error 1', 'error 2', 'output 1', 'output 2'])
+    @controller.logger.expects(:debug).at_least(4)
     do_post
   end
 
-  def test_exec_should_not_log_errors_if_none_occurred
-    stdout = mock_descriptor('STDOUT', ["output 1\n", "output 2\n"])
-    stderr = mock_descriptor('STDOUT', [])
-    Open3.expects(:popen3).returns(['STDIN', stdout, stderr])
-
-    @controller.logger.expects(:error).never
-    do_post
-  end
 end
