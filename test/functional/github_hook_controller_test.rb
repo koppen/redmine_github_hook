@@ -83,6 +83,12 @@ class GithubHookControllerTest < ActionController::TestCase
     do_post
   end
 
+  def test_should_use_project_identifier_from_request
+    Project.expects(:find_by_identifier).with('redmine').returns(@project)
+    @controller.stubs(:exec).returns(true)
+    post :index, :project_id => 'redmine', :payload => @json
+  end
+
   def test_should_render_ok_when_done
     @controller.expects(:exec).returns(true)
     do_post

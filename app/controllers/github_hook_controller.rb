@@ -10,7 +10,7 @@ class GithubHookController < ApplicationController
     logger.debug { "Received from Github: #{payload.inspect}" }
 
     # For now, we assume that the repository name is the same as the project identifier
-    identifier = payload['repository']['name']
+    identifier = params[:project_id] || payload['repository']['name']
 
     project = Project.find_by_identifier(identifier)
     raise ActiveRecord::RecordNotFound, "No project found with identifier '#{identifier}'" if project.nil?
@@ -30,7 +30,7 @@ class GithubHookController < ApplicationController
   end
 
   private
-  
+
   def exec(command)
     logger.debug { "GithubHook: Executing command: '#{command}'" }
     stdin, stdout, stderr = Open3.popen3(command)
