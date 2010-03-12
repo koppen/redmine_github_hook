@@ -111,6 +111,12 @@ class GithubHookControllerTest < ActionController::TestCase
     assert_equal 'OK', @response.body
   end
 
+  def test_should_return_404_if_project_identifier_not_given
+    assert_raises ActiveRecord::RecordNotFound do
+      do_post :repository => {}
+    end
+  end
+
   def test_should_return_404_if_project_not_found
     assert_raises ActiveRecord::RecordNotFound do
       Project.expects(:find_by_identifier).with('foobar').returns(nil)

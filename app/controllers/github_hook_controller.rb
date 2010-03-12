@@ -11,6 +11,7 @@ class GithubHookController < ApplicationController
 
     # For now, we assume that the repository name is the same as the project identifier
     identifier = params[:project_id] || payload['repository']['name']
+    raise ActiveRecord::RecordNotFound, "Project identifier not specified" if identifier.nil?
 
     project = Project.find_by_identifier(identifier.downcase)
     raise ActiveRecord::RecordNotFound, "No project found with identifier '#{identifier}'" if project.nil?
