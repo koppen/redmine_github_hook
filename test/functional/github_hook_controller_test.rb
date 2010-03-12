@@ -89,6 +89,13 @@ class GithubHookControllerTest < ActionController::TestCase
     post :index, :project_id => 'redmine', :payload => @json
   end
 
+  def test_should_downcase_identifier
+    # Redmine project identifiers are always downcase
+    Project.expects(:find_by_identifier).with('redmine').returns(@project)
+    @controller.stubs(:exec).returns(true)
+    post :index, :project_id => 'ReDmInE', :payload => @json
+  end
+
   def test_should_render_ok_when_done
     @controller.expects(:exec).returns(true)
     do_post
