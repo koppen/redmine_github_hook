@@ -126,7 +126,7 @@ class GithubHookControllerTest < ActionController::TestCase
 
   def test_should_return_500_if_project_has_no_repository
     assert_raises TypeError do
-      project = mock('project')
+      project = mock('project', :to_s => 'My Project', :identifier => 'github')
       project.expects(:repository).returns(nil)
       Project.expects(:find_by_identifier).with('github').returns(project)
       do_post :repository => {:name => 'github'}
@@ -135,7 +135,7 @@ class GithubHookControllerTest < ActionController::TestCase
 
   def test_should_return_500_if_repository_is_not_git
     assert_raises TypeError do
-      project = mock('project')
+      project = mock('project', :to_s => 'My Project', :identifier => 'github')
       repository = Repository::Subversion.new
       project.expects(:repository).at_least(1).returns(repository)
       Project.expects(:find_by_identifier).with('github').returns(project)
