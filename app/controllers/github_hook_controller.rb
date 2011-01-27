@@ -23,12 +23,10 @@ class GithubHookController < ApplicationController
     logger.debug { "GithubHook: Executing command: '#{command}'" }
     stdin, stdout, stderr = Open3.popen3(command)
 
-    output = stdout.readlines.collect(&:strip)
-    errors = stderr.readlines.collect(&:strip)
-
-    logger.debug { "GithubHook: Output from git:" }
-    logger.debug { "GithubHook:  * STDOUT: #{output}"}
-    logger.debug { "GithubHook:  * STDERR: #{output}"}
+    output = stdout.readlines
+    errors = stderr.readlines
+    logger.debug { "GithubHook: * STDOUT: #{output}"}
+    logger.debug { "GithubHook: * STDERR: #{errors}"}
   end
 
   def git_command(command, repository)
