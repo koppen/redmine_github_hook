@@ -33,7 +33,7 @@ class GithubHookController < ApplicationController
 
   # Fetches updates from the remote repository
   def update_repository(repository)
-    command = "git --git-dir='#{repository.url}' fetch origin && git --git-dir='#{repository.url}' reset --soft refs/remotes/origin/master"
+    command = "git --verbose --git-dir='#{repository.url}' fetch origin && git --verbose --git-dir='#{repository.url}' reset --soft refs/remotes/origin/master"
     exec(command)
   end
 
