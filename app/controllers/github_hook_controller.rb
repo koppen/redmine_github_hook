@@ -31,9 +31,13 @@ class GithubHookController < ApplicationController
     logger.debug { "GithubHook:  * STDERR: #{output}"}
   end
 
+  def git_command(command, repository)
+    "git --verbose --git-dir='#{repository.url}' #{command}"
+  end
+
   # Fetches updates from the remote repository
   def update_repository(repository)
-    command = "git --verbose --git-dir='#{repository.url}' fetch origin && git --verbose --git-dir='#{repository.url}' reset --soft refs/remotes/origin/master"
+    command = git_command('fetch origin', repository) + ' && ' + git_command('reset --soft refs/remotes/origin/master', repository)
     exec(command)
   end
 
