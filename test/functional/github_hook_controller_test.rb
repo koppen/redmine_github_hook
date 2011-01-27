@@ -81,9 +81,8 @@ class GithubHookControllerTest < ActionController::TestCase
   def test_should_update_the_repository_using_git_on_the_commandline
     Project.expects(:find_by_identifier).with('github').returns(@project)
     @controller.expects(:exec).with do |command|
-      command =~ /cd '#{@repository.url}'/ &&
-      command =~ /git fetch origin/ &&
-      command =~ /git reset --soft refs\/remotes\/origin\/master/
+      command =~ /git --git-dir='#{@repository.url}' fetch origin/ &&
+      command =~ /git --git-dir='#{@repository.url}' reset --soft refs\/remotes\/origin\/master/
     end.returns(true)
     do_post
   end
