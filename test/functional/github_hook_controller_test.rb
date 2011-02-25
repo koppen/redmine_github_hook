@@ -55,7 +55,7 @@ class GithubHookControllerTest < ActionController::TestCase
     Project.stubs(:find_by_identifier).with('github').returns(@project)
 
     # Make sure we don't run actual commands in test
-    Open3.stubs(:popen3)
+    Kernel.stubs(:system)
 
     Repository.expects(:fetch_changesets).never
   end
@@ -78,12 +78,23 @@ class GithubHookControllerTest < ActionController::TestCase
     do_post
   end
 
-  def test_should_update_the_repository_using_git_on_the_commandline
+  def test_should_fetch_changes_from_origin
     Project.expects(:find_by_identifier).with('github').returns(@project)
-    @controller.expects(:exec).with do |command|
-      command =~ /git --git-dir='#{@repository.url}' fetch origin/ &&
-      command =~ /git --git-dir='#{@repository.url}' reset --soft refs\/remotes\/origin\/master/
-    end.returns(true)
+    @controller.expects(:exec).with("git --git-dir='#{@repository.url}' fetch origin")
+    do_post
+  end
+
+  def test_should_reset_repository_when_fetch_origin_succeeds
+    Project.expects(:find_by_identifier).with('github').returns(@project)
+    @controller.expects(:exec).with("git --git-dir='#{@repository.url}' fetch origin").returns(true)
+    @controller.expects(:exec).with("git --git-dir='#{@repository.url}' reset --soft refs\/remotes\/origin\/master")
+    do_post
+  end
+
+  def test_should_not_reset_repository_when_fetch_origin_fails
+    Project.expects(:find_by_identifier).with('github').returns(@project)
+    @controller.expects(:exec).with("git --git-dir='#{@repository.url}' fetch origin").returns(false)
+    @controller.expects(:exec).with("git --git-dir='#{@repository.url}' reset --soft refs\/remotes\/origin\/master").never
     do_post
   end
 
@@ -101,14 +112,14 @@ class GithubHookControllerTest < ActionController::TestCase
   end
 
   def test_should_render_ok_when_done
-    @controller.expects(:exec).returns(true)
+    @controller.expects(:update_repository).returns(true)
     do_post
     assert_response :success
     assert_equal 'OK', @response.body
   end
 
   def test_should_fetch_changesets_into_the_repository
-    @controller.expects(:exec).returns(true)
+    @controller.expects(:update_repository).returns(true)
     @repository.expects(:fetch_changesets).returns(true)
     do_post
     assert_response :success
@@ -148,17 +159,20 @@ class GithubHookControllerTest < ActionController::TestCase
   end
 
   def test_should_not_require_login
-    @controller.expects(:exec).returns(true)
+    @controller.expects(:update_repository).returns(true)
     @controller.expects(:check_if_login_required).never
     do_post
   end
 
-  def test_exec_should_log_output_from_git_as_debug
-    stdout = mock_descriptor('STDOUT', ["output 1\n", "output 2\n"])
-    stderr = mock_descriptor('STDERR', ["error 1\n", "error 2\n"])
-    Open3.expects(:popen3).returns(['STDIN', stdout, stderr])
+  def test_exec_should_log_output_from_git_as_debug_when_things_go_well
+    @controller.expects(:`).at_least(1).returns(true)
+    @controller.logger.expects(:debug).at_least(1)
+    do_post
+  end
 
-    @controller.logger.expects(:debug).at_least(4)
+  def test_exec_should_log_output_from_git_as_debug_when_things_go_well
+    @controller.expects(:`).at_least(1).returns(false)
+    @controller.logger.expects(:error).at_least(1)
     do_post
   end
 

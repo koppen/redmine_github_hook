@@ -1,5 +1,4 @@
 require 'json'
-require 'open3'
 
 class GithubHookController < ApplicationController
 
@@ -21,12 +20,23 @@ class GithubHookController < ApplicationController
 
   def exec(command)
     logger.debug { "GithubHook: Executing command: '#{command}'" }
-    stdin, stdout, stderr = Open3.popen3(command)
 
-    output = stdout.readlines
-    errors = stderr.readlines
-    logger.debug { "GithubHook: * STDOUT: #{output}"}
-    logger.debug { "GithubHook: * STDERR: #{errors}"}
+    # Get a path to a temp file
+    logfile = Tempfile.new('github_hook_exec')
+    logfile.close
+
+    success = %x{ #{command} > #{logfile.path} 2>&1 }
+
+    output_from_command = File.readlines(logfile.path)
+    if success
+      logger.debug { "GithubHook: Command output: #{output_from_command.inspect}"}
+    else
+      logger.error { "GithubHook: Command '#{command}' didn't exit properly. Full output: #{output_from_command.inspect}"}
+    end
+
+    return success
+  ensure
+    logfile.unlink
   end
 
   def git_command(command, repository)
@@ -35,8 +45,11 @@ class GithubHookController < ApplicationController
 
   # Fetches updates from the remote repository
   def update_repository(repository)
-    command = git_command('fetch origin', repository) + ' && ' + git_command('reset --soft refs/remotes/origin/master', repository)
-    exec(command)
+    command = git_command('fetch origin', repository)
+    if exec(command)
+      command = git_command('reset --soft refs/remotes/origin/master', repository)
+      exec(command)
+    end
   end
 
   # Gets the project identifier from the querystring parameters and if that's not supplied, assume
