@@ -165,13 +165,13 @@ class GithubHookControllerTest < ActionController::TestCase
   end
 
   def test_exec_should_log_output_from_git_as_debug_when_things_go_well
-    @controller.expects(:`).at_least(1).returns(true)
+    @controller.expects(:system).at_least(1).returns(true)
     @controller.logger.expects(:debug).at_least(1)
     do_post
   end
 
-  def test_exec_should_log_output_from_git_as_debug_when_things_go_well
-    @controller.expects(:`).at_least(1).returns(false)
+  def test_exec_should_log_output_from_git_as_error_when_things_go_sour
+    @controller.expects(:system).at_least(1).returns(false)
     @controller.logger.expects(:error).at_least(1)
     do_post
   end

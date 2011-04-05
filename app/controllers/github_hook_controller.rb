@@ -18,6 +18,7 @@ class GithubHookController < ApplicationController
 
   private
 
+  # Executes shell command. Returns true if the shell command exits with a success status code
   def exec(command)
     logger.debug { "GithubHook: Executing command: '#{command}'" }
 
@@ -25,8 +26,7 @@ class GithubHookController < ApplicationController
     logfile = Tempfile.new('github_hook_exec')
     logfile.close
 
-    success = %x{ #{command} > #{logfile.path} 2>&1 }
-
+    success = system("#{command} > #{logfile.path} 2>&1")
     output_from_command = File.readlines(logfile.path)
     if success
       logger.debug { "GithubHook: Command output: #{output_from_command.inspect}"}
