@@ -36,8 +36,8 @@ That's it. Github will now send a HTTP POST to the Redmine Github Hook plugin wh
 
 == Assumptions
 
-* Redmine 0.9 running on a *nix-like system. It will probably work on Redmine 0.8 as well.
-* Git available on the commandline.
+* Redmine 1.1 running on a *nix-like system. It will probably work on older versions as well.
+* Git 1.5 or higher available on the commandline.
 
 
 == License
