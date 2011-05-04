@@ -1,0 +1,15 @@
+  <%
+    git_dir = Setting.plugin_redmine_github_hook[:git_dir]
+    git_dir = '/git_repositories' if git_dir.blank?
+  %>
+
+<p>
+  <%= content_tag(:label, l(:label_enabled_on)+"/"+l(:label_enabled_off)) %>
+  <%= check_box_tag 'settings[enabled]', true, Setting.plugin_redmine_github_hook[:enabled]%><br />
+</p>
+
+<p>
+  <%= content_tag(:label, l(:label_git_dir)+':') %>
+  <%= text_field_tag("settings[git_dir]", git_dir, :size=>26) %>
+</p>
+
