@@ -55,7 +55,7 @@ class GithubHookController < ApplicationController
   # Gets the project identifier from the querystring parameters and if that's not supplied, assume
   # the Github repository name is the same as the project identifier.
   def get_identifier
-    payload = JSON.parse(params[:payload])
+    payload = JSON.parse(params[:payload] || '{}')
     identifier = params[:project_id] || payload['repository']['name']
     raise ActiveRecord::RecordNotFound, "Project identifier not specified" if identifier.nil?
     return identifier
