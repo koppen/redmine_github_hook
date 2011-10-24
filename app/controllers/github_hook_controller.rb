@@ -5,13 +5,15 @@ class GithubHookController < ApplicationController
   skip_before_filter :verify_authenticity_token, :check_if_login_required
 
   def index
-    repository = find_repository
+    if request.post?
+      repository = find_repository
 
-    # Fetch the changes from Github
-    update_repository(repository)
+      # Fetch the changes from Github
+      update_repository(repository)
 
-    # Fetch the new changesets into Redmine
-    repository.fetch_changesets
+      # Fetch the new changesets into Redmine
+      repository.fetch_changesets
+    end
 
     render(:text => 'OK')
   end

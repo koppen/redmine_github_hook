@@ -176,4 +176,9 @@ class GithubHookControllerTest < ActionController::TestCase
     do_post
   end
 
+  def test_should_respond_to_get
+    get :index
+    assert_response :success
+  end
+
 end
