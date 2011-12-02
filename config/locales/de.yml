@@ -1,0 +1,7 @@
+## Deutsche lang strings für Rails i18n
+---
+de:
+  label_enabled_on: "aktiv"
+  label_enabled_off: "inaktiv"
+  
+  label_git_dir: "Verzeichnis für Git Repos"
