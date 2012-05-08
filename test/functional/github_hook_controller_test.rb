@@ -1,6 +1,5 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-require 'test/unit'
 require 'mocha'
 
 class GithubHookControllerTest < ActionController::TestCase
@@ -56,7 +55,8 @@ class GithubHookControllerTest < ActionController::TestCase
     Project.stubs(:find_by_identifier).with('github').returns(@project)
 
     # Make sure we don't run actual commands in test
-    @controller.expects(:system).never
+    Kernel.stubs(:system)
+
     Repository.expects(:fetch_changesets).never
   end
 
