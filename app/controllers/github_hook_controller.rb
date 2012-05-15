@@ -20,6 +20,10 @@ class GithubHookController < ApplicationController
 
   private
 
+  def system(command)
+    Kernel.system(command)
+  end
+
   # Executes shell command. Returns true if the shell command exits with a success status code
   def exec(command)
     logger.debug { "GithubHook: Executing command: '#{command}'" }
@@ -47,11 +51,18 @@ class GithubHookController < ApplicationController
 
   # Fetches updates from the remote repository
   def update_repository(repository)
-    command = git_command('fetch origin', repository)
-    if exec(command)
-      command = git_command("fetch origin '+refs/heads/*:refs/heads/*'", repository)
+    all_branches = Setting.plugin_redmine_github_hook[:all_branches]
+	all_branches = false if not all_branches
+    if all_branches != "yes"
+	  command = git_command('fetch --all', repository)
       exec(command)
-    end
+	else
+      command = git_command('fetch origin', repository)
+      if exec(command)
+        command = git_command("fetch origin '+refs/heads/*:refs/heads/*'", repository)
+        exec(command)
+      end
+	end
   end
 
   # Gets the project identifier from the querystring parameters and if that's not supplied, assume

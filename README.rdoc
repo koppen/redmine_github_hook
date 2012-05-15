@@ -18,8 +18,8 @@ That approach works perfectly fine, but is a bit heavy-handed and cumbersome. Th
    2. Follow the plugin installation procedure at http://www.redmine.org/wiki/redmine/Plugins.
    3. Restart your Redmine.
    4. If you already have a local Git repository set up and working from Redmine go to step 3, otherwise continue at step 2.
+2. Adding a Git repository to a project (note, this should work whether you want to use Redmine Github Hook or not). Simply follow the instructions at http://www.redmine.org/wiki/redmine/HowTo_keep_in_sync_your_git_repository_for_redmine . If the repository was cloned with "clone --mirror" please turn on the option "all_branches" in the plugin config page!
 
-2. Adding a Git repository to a project (note, this should work whether you want to use Redmine Github Hook or not). Simplyfollow the instructions at http://www.redmine.org/wiki/redmine/HowTo_keep_in_sync_your_git_repository_for_redmine
 
 3. Connecting Github to Redmine
    1. Go to the repository Admin interface on Github.
@@ -31,8 +31,8 @@ That's it. Github will now send a HTTP POST to the Redmine Github Hook plugin wh
 
 == Assumptions
 
-* Redmine 1.1 running on a *nix-like system. It will probably work on older versions as well.
-* Git 1.5 or higher available on the commandline.
+* Redmine 2.0 running on a *nix-like system. Older versions of redmine will not work.
+* Git 1.5 or higher available on the commandline. Also supports Git 1.6 repositories which are mirrored with the new "clone --mirror" command (default: off, please turn on in options when new mirror command was used).
 
 
 == License
