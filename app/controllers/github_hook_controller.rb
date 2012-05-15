@@ -20,6 +20,10 @@ class GithubHookController < ApplicationController
 
   private
 
+  def system(command)
+    Kernel.system(command)
+  end
+
   # Executes shell command. Returns true if the shell command exits with a success status code
   def exec(command)
     logger.debug { "GithubHook: Executing command: '#{command}'" }
