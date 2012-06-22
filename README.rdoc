@@ -1,6 +1,6 @@
 = Redmine Github Hook
 
-This plugin allows you to update your local Git repositories in Redmine when changes have been pushed to Github.
+This plugin allows you to clone github repository to local automaticly and update your local Git repositories in Redmine when changes have been pushed to Github.
 
 == Description
 
@@ -17,9 +17,11 @@ That approach works perfectly fine, but is a bit heavy-handed and cumbersome. Th
    1. Install the json gem <http://json.rubyforge.org/> on the machine where Redmine is running.
    2. Follow the plugin installation procedure at http://www.redmine.org/wiki/redmine/Plugins.
    3. Restart your Redmine.
-   4. If you already have a local Git repository set up and working from Redmine go to step 3, otherwise continue at step 2.
+   4. Config your local git repositories path in the plugin configuration(/settings/plugin/redmine_github_hook), pls ensure this path can be writable via redmine.
 
-2. Adding a Git repository to a project (note, this should work whether you want to use Redmine Github Hook or not). Simplyfollow the instructions at http://www.redmine.org/wiki/redmine/HowTo_keep_in_sync_your_git_repository_for_redmine
+2. Adding a Git repository to a project (note, this should work whether you want to use Redmine Github Hook or not). Just directly type "git://github.com/xxx.git", that's all.
+
+  ## Simplyfollow the instructions at http://www.redmine.org/wiki/redmine/HowTo_keep_in_sync_your_git_repository_for_redmine
 
 3. Connecting Github to Redmine
    1. Go to the repository Admin interface on Github.
@@ -34,10 +36,19 @@ That's it. Github will now send a HTTP POST to the Redmine Github Hook plugin wh
 * Redmine 1.1 running on a *nix-like system. It will probably work on older versions as well.
 * Git 1.5 or higher available on the commandline.
 
+== History
+
+0.2.0
+* + clone github repository to local automaticly
+* + the plugin configuration page to set the local git repositores path.
+* + show the scm url in the repository page via ZhuangBiaoWei 
+* + show the github url in the repository page
 
 == License
 
 Copyright (c) 2009 Jakob Skjerning
+
+Copyright (c) 2011 Riceball LEE
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation

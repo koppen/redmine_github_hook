@@ -1,0 +1,82 @@
+<%= call_hook(:view_repositories_show_contextual, { :repository => @repository, :project => @project }) %>
+<%
+  def git_command(command, repository)
+    "git --git-dir='#{repository.url}' #{command}"
+  end
+
+  # Executes shell command. Returns output from command  if the shell command exits with a success status code
+  def exec(command)
+    logger.debug { "Github: Executing command: '#{command}'" }
+
+    # Get a path to a temp file
+    logfile = Tempfile.new('github__exec')
+    logfile.close
+
+    success = system("#{command} > #{logfile.path} 2>&1")
+    output_from_command = File.readlines(logfile.path)
+    if success
+      logger.debug { "Github: Command output: #{output_from_command.inspect}"}
+#p "Github: Command output: #{output_from_command.inspect}"
+      return output_from_command
+    else
+      logger.error { "Github: Command '#{command}' didn't exit properly. Full output: #{output_from_command.inspect}"}
+#p "Github: Command '#{command}' didn't exit properly. Full output: #{output_from_command.inspect}"
+    end
+
+  ensure
+    logfile.unlink
+  end
+
+  url = @project.repository.url
+
+  if Setting.plugin_redmine_github_hook[:enabled] && @project.repository.type == 'Git' 
+    command = git_command('remote -v', @repository)
+    result = exec(command)
+     if result and result.is_a?(Array) and  result.length == 2
+       remote_name = result[0].split("\t")[0].strip
+       remote_url = result[0].split("\t")[1]
+       if remote_name == 'origin'
+         url = result[0].split("\t")[1].split(' ')[0]
+       end
+     end
+  end
+%>
+<div class="contextual">
+  <% if @project.is_public or @project.users.include?(User.current) %>
+  <%= @project.repository.type %> URL: <input type="text" value="<%= url %>" size="30"> 
+  <% end %>
+  <%= render :partial => 'navigation' %>
+</div>
+
+<h2><%= render :partial => 'breadcrumbs', :locals => { :path => @path, :kind => 'dir', :revision => @rev } %></h2>
+
+<% if !@entries.nil? && authorize_for('repositories', 'browse') %>
+<%= render :partial => 'dir_list' %>
+<% end %>
+
+<%= render_properties(@properties) %>
+
+<% if @changesets && !@changesets.empty? && authorize_for('repositories', 'revisions') %>
+<h3><%= l(:label_latest_revision_plural) %></h3>
+<%= render :partial => 'revisions', :locals => {:project => @project, :path => @path, :revisions => @changesets, :entry => nil }%>
+
+<% if @path.blank? %>
+	<p><%= link_to l(:label_view_all_revisions), :action => 'revisions', :id => @project %></p>
+<% else %>
+	<p><%= link_to l(:label_view_revisions), :action => 'changes', :path => to_path_param(@path), :id => @project %></p>
+<% end %>
+
+<% content_for :header_tags do %>
+  <%= auto_discovery_link_tag(:atom, params.merge({:format => 'atom', :action => 'revisions', :id => @project, :page => nil, :key => User.current.rss_key})) %>
+<% end %>
+
+<% other_formats_links do |f| %>
+	<%= f.link_to 'Atom', :url => {:action => 'revisions', :id => @project, :key => User.current.rss_key} %>
+<% end %>
+<% end %>
+
+<% content_for :header_tags do %>
+<%= stylesheet_link_tag "scm" %>
+<% end %>
+
+<% html_title(l(:label_repository)) -%>

@@ -32,8 +32,10 @@ class GithubHookController < ApplicationController
     output_from_command = File.readlines(logfile.path)
     if success
       logger.debug { "GithubHook: Command output: #{output_from_command.inspect}"}
+#p "GithubHook: Command output: #{output_from_command.inspect}"
     else
       logger.error { "GithubHook: Command '#{command}' didn't exit properly. Full output: #{output_from_command.inspect}"}
+#p "GithubHook: Command '#{command}' didn't exit properly. Full output: #{output_from_command.inspect}"
     end
 
     return success

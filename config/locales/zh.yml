@@ -1,0 +1,8 @@
+## YAML Template.
+---
+zh:
+  label_enabled_on: "开启"
+  label_enabled_off: "禁止"
+
+  label_git_dir: 'Git 本地仓库目录'
+

@@ -1,0 +1,7 @@
+# English strings go here for Rails i18n
+en:
+  
+  label_enabled_on: "On"
+  label_enabled_off: "Off"
+
+  label_git_dir: 'Git Local Repository Folder'
