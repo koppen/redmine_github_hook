@@ -1,0 +1,7 @@
+<fieldset>
+    <legend><%= l(:git_pull_type) %></legend>
+    <p>
+        <%= content_tag(:label, l(:all_branches)) %>
+        <%= check_box_tag("settings[all_branches]", "yes", Setting.plugin_redmine_github_hook[:all_branches] == "yes" ) %>
+    </p>
+</fieldset>
