@@ -52,6 +52,7 @@ class GithubHookControllerTest < ActionController::TestCase
 
     @project = Project.new
     @project.stubs(:repository).returns(@repository)
+    @project.stubs(:repositories).returns(@repository)
     Project.stubs(:find_by_identifier).with('github').returns(@project)
 
     # Make sure we don't run actual commands in test

@@ -5,15 +5,15 @@ class GithubHookController < ApplicationController
   skip_before_filter :verify_authenticity_token, :check_if_login_required
 
   def index
-    repositories = find_repositories
-
-	repositories.each { |repository|
+    if request.post?
+      repositories = find_repositories
+      repositories.each { |repository|
         # Fetch the changes from Github
         update_repository(repository)
-
         # Fetch the new changesets into Redmine
         repository.fetch_changesets
-	}
+      }
+    end
 
     render(:text => 'OK')
   end
@@ -74,8 +74,9 @@ class GithubHookController < ApplicationController
   # Returns the Redmine Repository objects we are trying to update
   def find_repositories
     project = find_project
-    all_repositories = project.repositories
     payload = JSON.parse(params[:payload])
+    all_repositories = project.repositories if project.respond_to? :repositories
+    all_repositories ||= Array(project.repository)
     raise TypeError, "Project '#{project.to_s}' ('#{project.identifier}') has no repositories" if all_repositories.empty?
 
     if params[:repository_id].present?
@@ -83,16 +84,10 @@ class GithubHookController < ApplicationController
         raise TypeError, "Project '#{project.to_s}' ('#{project.identifier}') has no repository with id #{params[:repository_id]}" if repository.nil?
         raise TypeError, "Repository '#{repository.identifier}' ('#{repository.id}') for project '#{project.to_s}' ('#{project.identifier}') is not a Git repository" unless repository.is_a?(Repository::Git)
         repositories = Array(repository)
-    elsif params[:update_all]
+    else # params[:update_all] or no params
         repositories = all_repositories.select { |repository| repository.is_a?(Repository::Git) }
         raise TypeError, "Project '#{project.to_s}' ('#{project.identifier}') has no Git repositories" if repositories.empty?
-    else
-        repository = project.repository
-        raise TypeError, "Project '#{project.to_s}' ('#{project.identifier}') has no repository" if repository.nil?
-        raise TypeError, "Default Repository for project '#{project.to_s}' ('#{project.identifier}') is not a Git repository" unless repository.is_a?(Repository::Git)
-        repositories = Array(repository)
     end
-
 
     return repositories
   end
