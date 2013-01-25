@@ -74,7 +74,6 @@ class GithubHookController < ApplicationController
   # Returns the Redmine Repository objects we are trying to update
   def find_repositories
     project = find_project
-    payload = JSON.parse(params[:payload])
     all_repositories = project.repositories if project.respond_to? :repositories
     all_repositories ||= Array(project.repository)
     raise TypeError, "Project '#{project.to_s}' ('#{project.identifier}') has no repositories" if all_repositories.empty?
