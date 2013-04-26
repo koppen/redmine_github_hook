@@ -15,11 +15,13 @@ class GithubHookController < ApplicationController
         # Fetch the new changesets into Redmine
         repository.fetch_changesets
       end
-
-      render(:text => 'OK')
-    elsif request.get?
-      # Redner the default layout
     end
+
+    render(:text => 'OK')
+  end
+
+  def welcome
+    # Render the default layout
   end
 
   private
