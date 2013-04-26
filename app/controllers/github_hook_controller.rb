@@ -15,9 +15,11 @@ class GithubHookController < ApplicationController
         # Fetch the new changesets into Redmine
         repository.fetch_changesets
       end
-    end
 
-    render(:text => 'OK')
+      render(:text => 'OK')
+    elsif request.get?
+      # Redner the default layout
+    end
   end
 
   private
@@ -87,7 +89,7 @@ class GithubHookController < ApplicationController
     if repositories.nil? or repositories.length == 0
         raise TypeError, "Project '#{project.to_s}' ('#{project.identifier}') has no repository"
     end
-    
+
     return repositories
   end
 
