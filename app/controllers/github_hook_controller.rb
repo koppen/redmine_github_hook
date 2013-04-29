@@ -20,6 +20,10 @@ class GithubHookController < ApplicationController
     render(:text => 'OK')
   end
 
+  def welcome
+    # Render the default layout
+  end
+
   private
 
   def system(command)
@@ -87,7 +91,7 @@ class GithubHookController < ApplicationController
     if repositories.nil? or repositories.length == 0
         raise TypeError, "Project '#{project.to_s}' ('#{project.identifier}') has no repository"
     end
-    
+
     return repositories
   end
 
