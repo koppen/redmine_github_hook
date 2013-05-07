@@ -85,11 +85,11 @@ class GithubHookController < ApplicationController
   def find_repositories
     project = find_project
     repositories = project.repositories.select do |repo|
-        repo.is_a?(Repository::Git)
+      repo.is_a?(Repository::Git)
     end
 
     if repositories.nil? or repositories.length == 0
-        raise TypeError, "Project '#{project.to_s}' ('#{project.identifier}') has no repository"
+      raise TypeError, "Project '#{project.to_s}' ('#{project.identifier}') has no repository"
     end
 
     return repositories
