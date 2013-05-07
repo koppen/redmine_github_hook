@@ -84,7 +84,7 @@ class GithubHookController < ApplicationController
   # Returns the Redmine Repository object we are trying to update
   def find_repositories
     project = find_project
-    repositories = project.repositories.all.select do |repo|
+    repositories = project.repositories.select do |repo|
         repo.is_a?(Repository::Git)
     end
 

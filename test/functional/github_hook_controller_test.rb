@@ -47,12 +47,13 @@ class GithubHookControllerTest < ActionController::TestCase
       "after": "de8251ff97ee194a289832576287d6f8ad74e3d0",
       "ref": "refs/heads/master"
     }'
+
     @repository = Repository::Git.new
     @repository.stubs(:fetch_changesets).returns(true)
-    @repository.stubs(:url).returns('/path/to/somewhere/on/the/local/filesystem/.git')
 
     @project = Project.new
-    @project.stubs(:repository).returns(@repository)
+    @project.repositories << @repository
+
     Project.stubs(:find_by_identifier).with('github').returns(@project)
 
     # Make sure we don't run actual commands in test
@@ -121,6 +122,7 @@ class GithubHookControllerTest < ActionController::TestCase
   def test_should_fetch_changesets_into_the_repository
     @controller.expects(:update_repository).returns(true)
     @repository.expects(:fetch_changesets).returns(true)
+
     do_post
     assert_response :success
     assert_equal 'OK', @response.body
@@ -142,7 +144,7 @@ class GithubHookControllerTest < ActionController::TestCase
   def test_should_return_500_if_project_has_no_repository
     assert_raises TypeError do
       project = mock('project', :to_s => 'My Project', :identifier => 'github')
-      project.expects(:repository).returns(nil)
+      project.expects(:repositories).returns([])
       Project.expects(:find_by_identifier).with('github').returns(project)
       do_post :repository => {:name => 'github'}
     end
@@ -152,7 +154,7 @@ class GithubHookControllerTest < ActionController::TestCase
     assert_raises TypeError do
       project = mock('project', :to_s => 'My Project', :identifier => 'github')
       repository = Repository::Subversion.new
-      project.expects(:repository).at_least(1).returns(repository)
+      project.expects(:repositories).at_least(1).returns([repository])
       Project.expects(:find_by_identifier).with('github').returns(project)
       do_post :repository => {:name => 'github'}
     end
