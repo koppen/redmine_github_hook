@@ -2,6 +2,7 @@ require 'json'
 
 class GithubHookController < ApplicationController
 
+  GIT_BIN = Redmine::Configuration['scm_git_command'] || "git"
   skip_before_filter :verify_authenticity_token, :check_if_login_required
 
   def index
@@ -52,7 +53,7 @@ class GithubHookController < ApplicationController
   end
 
   def git_command(command, repository)
-    "git --git-dir='#{repository.url}' #{command}"
+    GIT_BIN + " --git-dir='#{repository.url}' #{command}"
   end
 
   # Fetches updates from the remote repository
