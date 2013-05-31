@@ -61,7 +61,7 @@ class GithubHookUpdaterTest < Test::Unit::TestCase
 
   def test_resets_repository_when_fetch_origin_succeeds
     updater.expects(:exec).with("git fetch origin", repository.url).returns(true)
-    updater.expects(:exec).with("git fetch origin \"+refs/heads/*:refs/heads/*\"", repository.url)
+    updater.expects(:exec).with("git fetch --prune origin \"+refs/heads/*:refs/heads/*\"", repository.url)
     updater.call
   end
 

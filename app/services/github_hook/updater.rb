@@ -136,7 +136,7 @@ module GithubHook
     def update_repository(repository)
       command = git_command('fetch origin')
       if exec(command, repository.url)
-        command = git_command("fetch origin \"+refs/heads/*:refs/heads/*\"")
+        command = git_command("fetch --prune origin \"+refs/heads/*:refs/heads/*\"")
         exec(command, repository.url)
       end
     end
