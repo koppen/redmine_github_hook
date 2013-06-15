@@ -36,6 +36,24 @@ That's it. Github will now send a HTTP POST to the Redmine Github Hook plugin wh
 * Git 1.5 or higher available on the commandline.
 
 
+== Troubleshooting
+
+=== Check your logfile
+
+If you run into issues, your Redmine logfile might have some valuable information. Two things to check for:
+
+1. Does POST requests to /github_hook show up in the logfile at all? If so, what's the resulting status code?
+2. If the git command used to pull in changes fails for whatever reason, there should also be some details about the failure in the logfile.
+
+The logfile is usually found in your Redmine directory in log/production.log.
+
+=== Permissions
+
+As for permissions, whatever user you're running Redmine as needs to be able to read from your repository, otherwise fetching updates from GitHub will fail (thankfully).
+
+This means you need to add its SSH keys on GitHub. If the user doesn't already have an SSH key, generate one and add the public SSH key as a Deploy Key for the repository on GitHub (or as one of your own keys, if you prefer that).
+
+
 == License
 
 Copyright (c) 2009 Jakob Skjerning
