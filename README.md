@@ -1,53 +1,53 @@
-= Redmine GitHub Hook
+# Redmine GitHub Hook
 
 This plugin allows you to update your local Git repositories in Redmine when changes have been pushed to GitHub.
 
-== Description
+## Description
 
-Redmine <http://redmine.org> has supported Git repositories for a long time, allowing you to browse your code and view your changesets directly in Redmine. For this purpose, Redmine relies on local clones of the Git repositories.
+[Redmine](http://redmine.org) has supported Git repositories for a long time, allowing you to browse your code and view your changesets directly in Redmine. For this purpose, Redmine relies on local clones of the Git repositories.
 
 If your shared repository is on a remote machine - for example on GitHub - this unfortunately means a bit of legwork to keep the local, Redmine-accessible repository up-to-date. The common approach is to set up a cronjob that pulls in any changes with regular intervals and updates Redmine with them.
 
 That approach works perfectly fine, but is a bit heavy-handed and cumbersome. The Redmine GitHub Hook plugin allows GitHub to notify your Redmine installation when changes have been pushed to a repository, triggering an update of your local repository and Redmine data only when it is actually necessary.
 
 
-== Installation
+## Installation
 
 1. Installing the plugin
-   1. Install the json gem <http://json.rubyforge.org/> on the machine where Redmine is running.
-   2. Follow the plugin installation procedure at http://www.redmine.org/wiki/redmine/Plugins.
-      * Make sure that redmine_github_hook is installed in a directory named +redmine_github_hook+
+   1. Install the [json gem](http://json.rubyforge.org/) on the machine where Redmine is running.
+   2. Follow the plugin installation procedure outlined in the [Redmine wiki](http://www.redmine.org/wiki/redmine/Plugins).
+      * Make sure that Redmine GitHub Hook is installed in a directory named `redmine_github_hook`
    3. Restart your Redmine.
    4. If you already have a local Git repository set up and working from Redmine go to step 3, otherwise continue at step 2.
 
-2. Adding a Git repository to a project (note, this should work whether you want to use Redmine GitHub Hook or not). Simply follow the instructions at http://www.redmine.org/wiki/redmine/HowTo_keep_in_sync_your_git_repository_for_redmine
+2. Adding a Git repository to a project (note, this should work whether you want to use Redmine GitHub Hook or not). Simply follow the instructions for [keeping your git repository in sync](http://www.redmine.org/wiki/redmine/HowTo_keep_in_sync_your_git_repository_for_redmine).
 
 3. Connecting GitHub to Redmine
    1. Go to the repository Admin interface on GitHub.
-   2. Under "Service Hooks" add a new "WebHook URL" of the format: +[redmine_installation_url]/github_hook+ (for example +http://example.com/github_hook+).
-      1. By default, GitHub Hook assumes your GitHub repository name is the same as the project identifier in your Redmine installation. If this is not the case, you can specify the actual Redmine project identifier in the Post-Receive URL by using the format +[redmine_installation_url]/github_hook?project_id=[identifier]+ (for example +http://example.com/github_hook?project_id=my_project+).
+   2. Under "Service Hooks" add a new "WebHook URL" of the format: `[redmine_url]/github_hook` (for example `http://redmine.example.com/github_hook`).
+      1. By default, GitHub Hook assumes your GitHub repository name is the same as the project identifier in your Redmine installation. If this is not the case, you can specify the actual Redmine project identifier in the Post-Receive URL by using the format `[redmine_url]/github_hook?project_id=[identifier]` (for example `http://redmine.example.com/github_hook?project_id=my_project`).
 
 That's it. GitHub will now send a HTTP POST to the Redmine GitHub Hook plugin whenever changes are pushed to GitHub. The plugin then takes care of pulling the changes to the local repository and updating the Redmine database with them.
 
 
-== Assumptions
+## Assumptions
 
 * Redmine 2 running on a *nix-like system. Redmine versions before 2.0 should use the redmine_1.x branch.
 * Git 1.5 or higher available on the commandline.
 
 
-== Troubleshooting
+## Troubleshooting
 
-=== Check your logfile
+### Check your logfile
 
 If you run into issues, your Redmine logfile might have some valuable information. Two things to check for:
 
-1. Does POST requests to +/github_hook+ show up in the logfile at all? If so, what's the resulting status code?
+1. Do POST requests to `/github_hook` show up in the logfile at all? If so, what's the resulting status code?
 2. If the git command used to pull in changes fails for whatever reason, there should also be some details about the failure in the logfile.
 
-The logfile is usually found in your Redmine directory in +log/production.log+.
+The logfile is usually found in your Redmine directory in `log/production.log` although your webserver logs may contain some additional clues.
 
-=== Permissions problems
+### Permissions problems
 
 As for permissions, whatever user Redmine is running as needs permissions to do the following things:
 
@@ -56,18 +56,18 @@ As for permissions, whatever user Redmine is running as needs permissions to do 
 
 What user you are running Redmine as depends on your system and how you've setup your Redmine installation.
 
-==== GitHub
+#### GitHub
 
 This means you need to add its SSH keys on GitHub. If the user doesn't already have an SSH key, generate one and add the public SSH key as a Deploy Key for the repository on GitHub (or as one of your own keys, if you prefer that).
 
-==== Local repository
+#### Local repository
 
 The user running Redmine needs permissions to read and write to the local repository on the server.
 
 
-== License
+## License
 
-Copyright (c) 2009 Jakob Skjerning
+Copyright (c) 2009-2013 Jakob Skjerning
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
