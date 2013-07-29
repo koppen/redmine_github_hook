@@ -20,7 +20,7 @@ That approach works perfectly fine, but is a bit heavy-handed and cumbersome. Th
    3. Restart your Redmine.
    4. If you already have a local Git repository set up and working from Redmine go to step 3, otherwise continue at step 2.
 
-2. Adding a Git repository to a project (note, this should work whether you want to use Redmine Github Hook or not). Simplyfollow the instructions at http://www.redmine.org/wiki/redmine/HowTo_keep_in_sync_your_git_repository_for_redmine
+2. Adding a Git repository to a project (note, this should work whether you want to use Redmine Github Hook or not). Simply follow the instructions at http://www.redmine.org/wiki/redmine/HowTo_keep_in_sync_your_git_repository_for_redmine
 
 3. Connecting Github to Redmine
    1. Go to the repository Admin interface on Github.
@@ -47,11 +47,22 @@ If you run into issues, your Redmine logfile might have some valuable informatio
 
 The logfile is usually found in your Redmine directory in log/production.log.
 
-=== Permissions
+=== Permissions problems
 
-As for permissions, whatever user you're running Redmine as needs to be able to read from your repository, otherwise fetching updates from GitHub will fail (thankfully).
+As for permissions, whatever user Redmine is running as needs permissions to do the following things:
+
+* Read from the remote repository on GitHub
+* Read and write to the local repository on the Redmine server
+
+What user you are running Redmine as depends on your system and how you've setup your Redmine installation.
+
+==== GitHub
 
 This means you need to add its SSH keys on GitHub. If the user doesn't already have an SSH key, generate one and add the public SSH key as a Deploy Key for the repository on GitHub (or as one of your own keys, if you prefer that).
+
+==== Local repository
+
+The user running Redmine needs permissions to read and write to the local repository on the server.
 
 
 == License
