@@ -1,2 +1,3 @@
 # English strings go here for Rails i18n
-label_git_fetch_with_prune: "Fetch with prune option"
+en:
+  label_git_fetch_with_prune: "Fetch with prune option"
