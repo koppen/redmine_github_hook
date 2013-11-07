@@ -58,9 +58,10 @@ class GithubHookController < ApplicationController
 
   # Fetches updates from the remote repository
   def update_repository(repository)
-    command = git_command('fetch origin', repository)
+    fetch_opts = Settings.plugin_redmine_github_hook[:git_fetch_with_prune] ? '--prune' : ''
+    command = git_command("fetch #{fetch_opts} origin", repository)
     if exec(command)
-      command = git_command("fetch origin '+refs/heads/*:refs/heads/*'", repository)
+      command = git_command("fetch #{fetch_opts} origin '+refs/heads/*:refs/heads/*'", repository)
       exec(command)
     end
   end

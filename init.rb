@@ -5,4 +5,10 @@ Redmine::Plugin.register :redmine_github_hook do
   author 'Jakob Skjerning'
   description 'This plugin allows your Redmine installation to receive Github post-receive notifications'
   version '0.2.0'
+  url 'https://github.com/koppen/redmine_github_hook'
+
+  settings :default => {
+    :git_fetch_with_prune => false,
+  }, :partial => 'settings/redmine_github_hook'
+
 end

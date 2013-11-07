@@ -1,0 +1,3 @@
+# Japanse strings go here for Rails i18n
+ja:
+  label_git_fetch_with_prune: "pruneオプション付きでfetch"
