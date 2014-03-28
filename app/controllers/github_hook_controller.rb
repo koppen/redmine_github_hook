@@ -60,7 +60,7 @@ class GithubHookController < ApplicationController
   def update_repository(repository)
     command = git_command('fetch origin', repository)
     if exec(command)
-      command = git_command("fetch origin '+refs/heads/*:refs/heads/*'", repository)
+      command = git_command("fetch origin \"+refs/heads/*:refs/heads/*\"", repository)
       exec(command)
     end
   end
