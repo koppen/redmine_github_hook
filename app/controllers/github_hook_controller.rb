@@ -52,16 +52,18 @@ class GithubHookController < ApplicationController
     logfile.unlink
   end
 
-  def git_command(command, repository)
-    GIT_BIN + " --git-dir=\"#{repository.url}\" #{command}"
+  def git_command(command)
+    GIT_BIN + " #{command}"
   end
 
   # Fetches updates from the remote repository
   def update_repository(repository)
-    command = git_command('fetch origin', repository)
-    if exec(command)
-      command = git_command("fetch origin \"+refs/heads/*:refs/heads/*\"", repository)
-      exec(command)
+    Dir.chdir(repository.url) do
+      command = git_command('fetch origin')
+      if exec(command)
+        command = git_command("fetch origin \"+refs/heads/*:refs/heads/*\"")
+        exec(command)
+      end
     end
   end
 
