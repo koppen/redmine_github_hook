@@ -92,21 +92,21 @@ class GithubHookControllerTest < ActionController::TestCase
 
   def test_should_fetch_changes_from_origin
     Project.expects(:find_by_identifier).with('github').returns(project)
-    @controller.expects(:exec).with("git --git-dir=\"#{repository.url}\" fetch origin")
+    @controller.expects(:exec).with("git fetch origin", repository.url)
     do_post
   end
 
   def test_should_reset_repository_when_fetch_origin_succeeds
     Project.expects(:find_by_identifier).with('github').returns(project)
-    @controller.expects(:exec).with("git --git-dir=\"#{repository.url}\" fetch origin").returns(true)
-    @controller.expects(:exec).with("git --git-dir=\"#{repository.url}\" fetch origin \"+refs/heads/*:refs/heads/*\"")
+    @controller.expects(:exec).with("git fetch origin", repository.url).returns(true)
+    @controller.expects(:exec).with("git fetch origin \"+refs/heads/*:refs/heads/*\"", repository.url)
     do_post
   end
 
   def test_should_not_reset_repository_when_fetch_origin_fails
     Project.expects(:find_by_identifier).with('github').returns(project)
-    @controller.expects(:exec).with("git --git-dir=\"#{repository.url}\" fetch origin").returns(false)
-    @controller.expects(:exec).with("git --git-dir=\"#{repository.url}\" reset --soft refs\/remotes\/origin\/master").never
+    @controller.expects(:exec).with("git fetch origin", repository.url).returns(false)
+    @controller.expects(:exec).with("git reset --soft refs\/remotes\/origin\/master", repository.url).never
     do_post
   end
 

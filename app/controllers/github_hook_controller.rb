@@ -31,15 +31,27 @@ class GithubHookController < ApplicationController
     Kernel.system(command)
   end
 
-  # Executes shell command. Returns true if the shell command exits with a success status code
-  def exec(command)
+  # Executes shell command. Returns true if the shell command exits with a
+  # success status code.
+  #
+  # If directory is given the current directory will be changed to that
+  # directory before executing command.
+  def exec(command, directory)
     logger.debug { "GithubHook: Executing command: '#{command}'" }
 
     # Get a path to a temp file
     logfile = Tempfile.new('github_hook_exec')
     logfile.close
 
-    success = system("#{command} > #{logfile.path} 2>&1")
+    full_command = "#{command} > #{logfile.path} 2>&1"
+    success = if directory.present?
+      Dir.chdir(directory) do
+        system(full_command)
+      end
+    else
+      system(full_command)
+    end
+
     output_from_command = File.readlines(logfile.path)
     if success
       logger.debug { "GithubHook: Command output: #{output_from_command.inspect}"}
@@ -58,12 +70,10 @@ class GithubHookController < ApplicationController
 
   # Fetches updates from the remote repository
   def update_repository(repository)
-    Dir.chdir(repository.url) do
-      command = git_command('fetch origin')
-      if exec(command)
-        command = git_command("fetch origin \"+refs/heads/*:refs/heads/*\"")
-        exec(command)
-      end
+    command = git_command('fetch origin')
+    if exec(command, repository.url)
+      command = git_command("fetch origin \"+refs/heads/*:refs/heads/*\"")
+      exec(command, repository.url)
     end
   end
 
