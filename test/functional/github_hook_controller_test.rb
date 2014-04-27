@@ -116,6 +116,12 @@ class GithubHookControllerTest < ActionController::TestCase
     post :index, :project_id => 'redmine', :payload => json
   end
 
+  def test_should_return_404_if_project_identifier_not_found
+    assert_raises ActiveRecord::RecordNotFound do
+      post :index
+    end
+  end
+
   def test_should_downcase_identifier
     # Redmine project identifiers are always downcase
     Project.expects(:find_by_identifier).with('redmine').returns(project)

@@ -68,10 +68,16 @@ class GithubHookController < ApplicationController
   # Gets the project identifier from the querystring parameters and if that's not supplied, assume
   # the Github repository name is the same as the project identifier.
   def get_identifier
-    payload = JSON.parse(params[:payload] || '{}')
-    identifier = params[:project_id] || payload['repository']['name']
+    identifier = get_project_name
     raise ActiveRecord::RecordNotFound, "Project identifier not specified" if identifier.nil?
     return identifier
+  end
+
+  # Attempts to find the project name. It first looks in the params, then in the
+  # payload if params[:project_id] isn't given.
+  def get_project_name
+    payload = JSON.parse(params[:payload] || '{}')
+    params[:project_id] || (payload['repository'] ? payload['repository']['name'] : nil)
   end
 
   # Finds the Redmine project in the database based on the given project identifier
