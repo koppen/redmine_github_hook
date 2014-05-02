@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in redmine_github_hook.gemspec
-gemspec
+# Use the gems defined in the plugins gemspec
+gemspec(:path => File.dirname(__FILE__))
