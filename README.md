@@ -28,6 +28,7 @@ You have two options for installing the plugin:
 
 1. Follow the plugin installation procedure outlined in the [Redmine wiki](http://www.redmine.org/wiki/redmine/Plugins).
   * Make sure that Redmine GitHub Hook is installed in a directory named `redmine_github_hook`
+  * Easiest way: change in your plugins directory and pull with git: `git clone git://github.com/koppen/redmine_github_hook.git`
 2. Restart your Redmine.
 
 ### 2. Add the repository to Redmine
@@ -35,6 +36,7 @@ You have two options for installing the plugin:
 Adding a Git repository to a project (note, this should work whether you want to use Redmine GitHub Hook or not).
 
 1. Simply follow the instructions for [keeping your git repository in sync](http://www.redmine.org/wiki/redmine/HowTo_keep_in_sync_your_git_repository_for_redmine).
+ * You don't need to set up a cron task as described in the Redmine FAQ
 
 ### 3. Connecting GitHub to Redmine
 
