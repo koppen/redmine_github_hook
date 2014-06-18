@@ -84,6 +84,15 @@ This means you need to add its SSH keys on GitHub. If the user doesn't already h
 The user running Redmine needs permissions to read and write to the local repository on the server.
 
 
+## What happens
+
+The interactions between the different parts of the process is outlined in the following sequence diagram:
+
+![sequence](https://cloud.githubusercontent.com/assets/6480/3311503/3a789390-f6c5-11e3-804d-d5ca2562799f.png)
+
+(Diagram made with [http://bramp.github.io/js-sequence-diagrams/](js-sequence-diagrams)).
+
+
 ## License
 
 Copyright (c) 2009-2014 Jakob Skjerning
