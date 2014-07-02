@@ -48,6 +48,8 @@ Adding a Git repository to a project (note, this should work whether you want to
 
 That's it. GitHub will now send a HTTP POST to the Redmine GitHub Hook plugin whenever changes are pushed to GitHub. The plugin then takes care of pulling the changes to the local repository and updating the Redmine database with them.
 
+**Note:** If the repository's identifier on GitHub and Redmine match, only this specific repo is going to be updated. Otherwise, this plugin will update ALL repositories for the specified Redmine project which may take a while...
+
 
 ## Assumptions
 
