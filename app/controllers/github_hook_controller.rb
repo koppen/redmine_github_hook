@@ -8,13 +8,29 @@ class GithubHookController < ApplicationController
   def index
     if request.post?
       repositories = find_repositories
+      
+      # get the GitHub repo name from the GitHub payload
+      payload_repo_name = get_payload_repo_name
+      logger.info { "  GithubHook: payload_repo_name: #{payload_repo_name}" }
+      
+      # check if payload repo is one of the current project's repositories
+      payload_repo = get_repo_from_project(repositories, payload_repo_name)
+      
 
-      repositories.each do |repository|
-        # Fetch the changes from Github
-        update_repository(repository)
-
-        # Fetch the new changesets into Redmine
-        repository.fetch_changesets
+      # if payload repo isn't one of the current project repositories
+      # then update ALL of the project's repos (standard behaviour until now)
+      if payload_repo.nil? || payload_repo.empty?
+        logger.info { "  GithubHook: Payload repo '#{payload_repo_name}' isn't in the list of projects repos. Updating all." }
+        repositories.each do |repository|
+          update_repo_and_redmine(repository)
+        end
+        
+      else
+        payload_repo.each do |repository|
+          # if payload repo IS in the list of project repos,
+          # only update this one to avoid performance issues (#54)
+          update_repo_and_redmine(repository)
+        end
       end
     end
 
@@ -105,6 +121,27 @@ class GithubHookController < ApplicationController
     payload = JSON.parse(params[:payload] || '{}')
     payload['repository'] ? payload['repository']['name'] : nil
   end
+
+  # Get the repository with the same id as in the payload
+  # from the list of the projects repos
+  def get_repo_from_project(repositories, payload_repo_name)
+    payload_repo = repositories.select do |repo|
+      repo.identifier == payload_repo_name
+    end
+    return payload_repo
+  end
+
+  # Update the repo and fetch changes in Redmine
+  def update_repo_and_redmine(repository)
+    # Fetch the changes from Github
+    update_repository(repository)
+
+    # Fetch the new changesets into Redmine
+    repository.fetch_changesets
+    
+    logger.info { "  GithubHook: Redmine repository updated: #{repository.identifier}" }
+  end
+
   # Returns the Redmine Repository object we are trying to update
   def find_repositories
     project = find_project
