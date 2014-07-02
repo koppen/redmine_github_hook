@@ -88,8 +88,7 @@ class GithubHookController < ApplicationController
   # Attempts to find the project name. It first looks in the params, then in the
   # payload if params[:project_id] isn't given.
   def get_project_name
-    payload = JSON.parse(params[:payload] || '{}')
-    params[:project_id] || (payload['repository'] ? payload['repository']['name'] : nil)
+    params[:project_id] || get_payload_repo_name
   end
 
   # Finds the Redmine project in the database based on the given project identifier
@@ -100,6 +99,12 @@ class GithubHookController < ApplicationController
     return project
   end
 
+  # Attempts to find the repository name in the GitHub payload
+  # either returns the payload name or nil
+  def get_payload_repo_name
+    payload = JSON.parse(params[:payload] || '{}')
+    payload['repository'] ? payload['repository']['name'] : nil
+  end
   # Returns the Redmine Repository object we are trying to update
   def find_repositories
     project = find_project
