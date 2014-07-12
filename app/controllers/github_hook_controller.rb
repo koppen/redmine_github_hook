@@ -15,6 +15,8 @@ class GithubHookController < ApplicationController
 
         # Fetch the new changesets into Redmine
         repository.fetch_changesets
+        
+        logger.info { "  GithubHook: Redmine repository updated: #{repository.identifier}" }
       end
     end
 
