@@ -39,7 +39,7 @@ class GithubHookController < ApplicationController
   # If directory is given the current directory will be changed to that
   # directory before executing command.
   def exec(command, directory)
-    logger.debug { "GithubHook: Executing command: '#{command}'" }
+    logger.debug { "  GithubHook: Executing command: '#{command}'" }
 
     # Get a path to a temp file
     logfile = Tempfile.new('github_hook_exec')
@@ -56,9 +56,9 @@ class GithubHookController < ApplicationController
 
     output_from_command = File.readlines(logfile.path)
     if success
-      logger.debug { "GithubHook: Command output: #{output_from_command.inspect}"}
+      logger.debug { "  GithubHook: Command output: #{output_from_command.inspect}"}
     else
-      logger.error { "GithubHook: Command '#{command}' didn't exit properly. Full output: #{output_from_command.inspect}"}
+      logger.error { "  GithubHook: Command '#{command}' didn't exit properly. Full output: #{output_from_command.inspect}"}
     end
 
     return success
