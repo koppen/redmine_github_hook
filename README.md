@@ -42,11 +42,14 @@ Adding a Git repository to a project (note, this should work whether you want to
 
 1. Go to the repository Settings interface on GitHub.
 2. Under "Webhooks & Services" add a new "WebHook". The "Payload URL" needs to be of the format: `[redmine_url]/github_hook` (for example `http://redmine.example.com/github_hook`).
-   * By default, GitHub Hook assumes your GitHub repository name is the same as the project identifier in your Redmine installation. If this is not the case, you can specify the actual Redmine project identifier in the Post-Receive URL by using the format `[redmine_url]/github_hook?project_id=[identifier]` (for example `http://redmine.example.com/github_hook?project_id=my_project`).
+   * By default, GitHub Hook assumes your GitHub repository name is the same as the *project identifier* in your Redmine installation.
+     * If this is not the case, you can specify the actual Redmine project identifier in the Post-Receive URL by using the format `[redmine_url]/github_hook?project_id=[identifier]` (for example `http://redmine.example.com/github_hook?project_id=my_project`).
+     * GitHub Hook will then update **all repositories** in the specified project. *Be aware, that this process may take a while if you have many repositories in your project.*
+     * If you want GitHub Hook to **only update the current repository** you can specify it with an additional parameter in the Post-Receive URL by using the format `[redmine_url]/github_hook?project_id=[identifier]&repo_id=[repository]` (for example `http://redmine.example.com/github_hook?project_id=my_project&repo_id=my_repo`).
    * In most cases, just having the "push" event trigger the webhook should suffice, but you are free to customize the events as you desire.
-   * Note: Make sure you're adding a Webhook - which is what Redmine Github Hook expects. GitHub has some builtin Redmine integration; that's not what you're looking for.
+   * *Note: Make sure you're adding a Webhook - which is what Redmine Github Hook expects. GitHub has some builtin Redmine integration; that's not what you're looking for.*
 
-That's it. GitHub will now send a HTTP POST to the Redmine GitHub Hook plugin whenever changes are pushed to GitHub. The plugin then takes care of pulling the changes to the local repository and updating the Redmine database with them.
+That's it. GitHub will now send a HTTP POST to the Redmine GitHub Hook plugin whenever changes are pushed to GitHub. The plugin then takes care of pulling the changes to the local repositories and updating the Redmine database with them.
 
 
 ## Assumptions
