@@ -10,13 +10,17 @@ class GithubHookController < ApplicationController
       repositories = find_repositories
 
       repositories.each do |repository|
+            tg1 = Time.now
         # Fetch the changes from Github
         update_repository(repository)
-
+            tg2 = Time.now
+        
+            tr1 = Time.now
         # Fetch the new changesets into Redmine
         repository.fetch_changesets
+            tr2 = Time.now
         
-        logger.info { "  GithubHook: Redmine repository updated: #{repository.identifier}" }
+        logger.info { "  GithubHook: Redmine repository updated: #{repository.identifier} (Git: #{time_diff_milli(tg1,tg2)}ms, Redmine: #{time_diff_milli(tr1,tr2)}ms)" }
       end
     end
 
@@ -31,6 +35,10 @@ class GithubHookController < ApplicationController
 
   def system(command)
     Kernel.system(command)
+  end
+  
+  def time_diff_milli(start, finish)
+    ((finish - start) * 1000.0).round(1)
   end
 
   # Executes shell command. Returns true if the shell command exits with a
