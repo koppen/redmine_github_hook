@@ -16,7 +16,7 @@ class GithubHookUpdaterTest < Test::Unit::TestCase
   def repository
     return @repository if @repository
 
-    @repository ||= Repository::Git.new
+    @repository ||= Repository::Git.new(:identifier => "redmine")
     @repository.stubs(:fetch_changesets).returns(true)
     @repository
   end
@@ -74,6 +74,36 @@ class GithubHookUpdaterTest < Test::Unit::TestCase
   def test_uses_project_identifier_from_request
     Project.expects(:find_by_identifier).with('redmine').returns(project)
     updater = build_updater(payload, {:project_id => 'redmine'})
+    updater.call
+  end
+
+  def test_updates_all_repositories_by_default
+    another_repository = Repository::Git.new
+    another_repository.expects(:fetch_changesets).returns(true)
+    project.repositories << another_repository
+
+    updater = build_updater(payload)
+    updater.expects(:exec).with("git fetch origin", repository.url)
+    updater.call
+  end
+
+  def test_updates_only_the_specified_repository
+    another_repository = Repository::Git.new
+    another_repository.expects(:fetch_changesets).never
+    project.repositories << another_repository
+
+    updater = build_updater(payload, {:repository_id => 'redmine'})
+    updater.expects(:exec).with("git fetch origin", repository.url)
+    updater.call
+  end
+
+  def test_updates_all_repositories_if_specific_repository_is_not_found
+    another_repository = Repository::Git.new
+    another_repository.expects(:fetch_changesets).returns(true)
+    project.repositories << another_repository
+
+    updater = build_updater(payload, {:repository_id => 'redmine or something'})
+    updater.expects(:exec).with("git fetch origin", repository.url)
     updater.call
   end
 
