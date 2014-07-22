@@ -21,56 +21,13 @@ class GithubHookUpdaterTest < Test::Unit::TestCase
     @repository
   end
 
-  def json
-    # Sample JSON post from http://github.com/guides/post-receive-hooks
-    '{
-      "before": "5aef35982fb2d34e9d9d4502f6ede1072793222d",
-      "repository": {
-        "url": "http://github.com/defunkt/github",
-        "name": "github",
-        "description": "You\'re lookin\' at it.",
-        "watchers": 5,
-        "forks": 2,
-        "private": 1,
-        "owner": {
-          "email": "chris@ozmm.org",
-          "name": "defunkt"
-        }
-      },
-      "commits": [
-        {
-          "id": "41a212ee83ca127e3c8cf465891ab7216a705f59",
-          "url": "http://github.com/defunkt/github/commit/41a212ee83ca127e3c8cf465891ab7216a705f59",
-          "author": {
-            "email": "chris@ozmm.org",
-            "name": "Chris Wanstrath"
-          },
-          "message": "okay i give in",
-          "timestamp": "2008-02-15T14:57:17-08:00",
-          "added": ["filepath.rb"]
-        },
-        {
-          "id": "de8251ff97ee194a289832576287d6f8ad74e3d0",
-          "url": "http://github.com/defunkt/github/commit/de8251ff97ee194a289832576287d6f8ad74e3d0",
-          "author": {
-            "email": "chris@ozmm.org",
-            "name": "Chris Wanstrath"
-          },
-          "message": "update pricing a tad",
-          "timestamp": "2008-02-15T14:36:34-08:00"
-        }
-      ],
-      "after": "de8251ff97ee194a289832576287d6f8ad74e3d0",
-      "ref": "refs/heads/master"
-    }'
+  def payload
+    # Ruby hash with the parsed data from the JSON payload
+    {"before"=>"5aef35982fb2d34e9d9d4502f6ede1072793222d", "repository"=>{"url"=>"http://github.com/defunkt/github", "name"=>"github", "description"=>"You're lookin' at it.", "watchers"=>5, "forks"=>2, "private"=>1, "owner"=>{"email"=>"chris@ozmm.org", "name"=>"defunkt"}}, "commits"=>[{"id"=>"41a212ee83ca127e3c8cf465891ab7216a705f59", "url"=>"http://github.com/defunkt/github/commit/41a212ee83ca127e3c8cf465891ab7216a705f59", "author"=>{"email"=>"chris@ozmm.org", "name"=>"Chris Wanstrath"}, "message"=>"okay i give in", "timestamp"=>"2008-02-15T14:57:17-08:00", "added"=>["filepath.rb"]}, {"id"=>"de8251ff97ee194a289832576287d6f8ad74e3d0", "url"=>"http://github.com/defunkt/github/commit/de8251ff97ee194a289832576287d6f8ad74e3d0", "author"=>{"email"=>"chris@ozmm.org", "name"=>"Chris Wanstrath"}, "message"=>"update pricing a tad", "timestamp"=>"2008-02-15T14:36:34-08:00"}], "after"=>"de8251ff97ee194a289832576287d6f8ad74e3d0", "ref"=>"refs/heads/master"}
   end
 
-  def params
-    {:payload => json}
-  end
-
-  def build_updater(options = {})
-    updater = GithubHook::Updater.new(options)
+  def build_updater(payload, options = {})
+    updater = GithubHook::Updater.new(payload, options)
     updater.logger = Rails.logger
     updater.stubs(:exec).returns(true)
     updater
@@ -78,7 +35,7 @@ class GithubHookUpdaterTest < Test::Unit::TestCase
 
   def updater
     return @memoized_updater if @memoized_updater
-    @memoized_updater = build_updater(params)
+    @memoized_updater = build_updater(payload)
   end
 
   def setup
@@ -117,7 +74,7 @@ class GithubHookUpdaterTest < Test::Unit::TestCase
 
   def test_uses_project_identifier_from_request
     Project.expects(:find_by_identifier).with('redmine').returns(project)
-    updater = build_updater(params.merge({:project_id => 'redmine'}))
+    updater = build_updater(payload, {:project_id => 'redmine'})
     updater.call
   end
 
@@ -130,7 +87,7 @@ class GithubHookUpdaterTest < Test::Unit::TestCase
 
   def test_raises_record_not_found_if_project_identifier_not_given
     assert_raises ActiveRecord::RecordNotFound do
-      updater = build_updater({:repository => {}})
+      updater = build_updater(payload.merge({"repository" => {}}))
       updater.call
     end
   end
@@ -138,7 +95,7 @@ class GithubHookUpdaterTest < Test::Unit::TestCase
   def test_raises_record_not_found_if_project_not_found
     assert_raises ActiveRecord::RecordNotFound do
       Project.expects(:find_by_identifier).with('foobar').returns(nil)
-      updater = build_updater({:project_id => "foobar"})
+      updater = build_updater(payload, {:project_id => "foobar"})
       updater.call
     end
   end
@@ -146,7 +103,7 @@ class GithubHookUpdaterTest < Test::Unit::TestCase
   def test_downcases_identifier
     # Redmine project identifiers are always downcase
     Project.expects(:find_by_identifier).with('redmine').returns(project)
-    updater = build_updater(params.merge({:project_id => 'ReDmInE'}))
+    updater = build_updater(payload, {:project_id => 'ReDmInE'})
     updater.call
   end
 

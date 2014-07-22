@@ -5,7 +5,8 @@ class GithubHookController < ApplicationController
 
   def index
     if request.post?
-      updater = GithubHook::Updater.new(params)
+      payload = JSON.parse(params[:payload] || '{}')
+      updater = GithubHook::Updater.new(payload, params)
       updater.logger = logger
       updater.call
     end

@@ -4,7 +4,8 @@ module GithubHook
 
     attr_accessor :logger
 
-    def initialize(params)
+    def initialize(payload, params = {})
+      @payload = payload
       @params = params
     end
 
@@ -28,7 +29,7 @@ module GithubHook
 
     private
 
-    attr_reader :params
+    attr_reader :params, :payload
 
     # Executes shell command. Returns true if the shell command exits with a
     # success status code.
@@ -112,7 +113,6 @@ module GithubHook
     # Attempts to find the project name. It first looks in the params, then in the
     # payload if params[:project_id] isn't given.
     def get_project_name
-      payload = JSON.parse(params[:payload] || '{}')
       params[:project_id] || (payload['repository'] ? payload['repository']['name'] : nil)
     end
 
