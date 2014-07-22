@@ -28,7 +28,6 @@ class GithubHookUpdaterTest < Test::Unit::TestCase
 
   def build_updater(payload, options = {})
     updater = GithubHook::Updater.new(payload, options)
-    updater.logger = Rails.logger
     updater.stubs(:exec).returns(true)
     updater
   end
@@ -130,5 +129,16 @@ class GithubHookUpdaterTest < Test::Unit::TestCase
       Project.expects(:find_by_identifier).with('github').returns(project)
       updater.call
     end
+  end
+
+  def test_logs_if_a_logger_is_given
+    updater = GithubHook::Updater.new(payload)
+    updater.stubs(:exec).returns(true)
+
+    logger = stub('Logger')
+    logger.expects(:info).at_least_once
+    updater.logger = logger
+
+    updater.call
   end
 end

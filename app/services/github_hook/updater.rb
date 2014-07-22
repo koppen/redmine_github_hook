@@ -2,7 +2,7 @@ module GithubHook
   class Updater
     GIT_BIN = Redmine::Configuration['scm_git_command'] || "git"
 
-    attr_accessor :logger
+    attr_writer :logger
 
     def initialize(payload, params = {})
       @payload = payload
@@ -28,6 +28,13 @@ module GithubHook
     end
 
     private
+
+    class NullLogger
+      def debug(*_); end
+      def info(*_); end
+      def warn(*_); end
+      def error(*_); end
+    end
 
     attr_reader :params, :payload
 
@@ -118,6 +125,10 @@ module GithubHook
 
     def git_command(command)
       GIT_BIN + " #{command}"
+    end
+
+    def logger
+      @logger || NullLogger.new
     end
 
     def system(command)
