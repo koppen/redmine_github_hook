@@ -72,22 +72,8 @@ class GithubHookControllerTest < ActionController::TestCase
     Repository.expects(:fetch_changesets).never
   end
 
-  def mock_descriptor(kind, contents = [])
-    descriptor = mock(kind)
-    descriptor.expects(:readlines).returns(contents)
-    descriptor
-  end
-
-  def do_post(payload = nil)
-    payload = json if payload.nil?
-    payload = payload.to_json if payload.is_a?(Hash)
-    post :index, :payload => payload
-  end
-
-  def test_should_use_the_repository_name_as_project_identifier
-    Project.expects(:find_by_identifier).with('github').returns(project)
-    GithubHook::Updater.any_instance.stubs(:exec).returns(true)
-    do_post
+  def do_post
+    post :index, :payload => json
   end
 
   def test_should_render_ok_when_done
