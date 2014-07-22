@@ -90,16 +90,16 @@ module GithubHook
         raise TypeError, "Project '#{project.to_s}' ('#{project.identifier}') has no repository"
       end
 
-      # if a specific repository id is passed in url parameter "repo_id", then try to find it in
+      # if a specific repository id is passed in url parameter "repository_id", then try to find it in
       # the list of current project repositories and use only this and not all to pull changes from
       # (issue #54)
-      if params.has_key?(:repo_id)
+      if params.has_key?(:repository_id)
         param_repo = repositories.select do |repo|
-          repo.identifier == params[:repo_id]
+          repo.identifier == params[:repository_id]
         end
 
         if param_repo.nil? or param_repo.length == 0
-          logger.info { "  GithubHook: The repository '#{params[:repo_id]}' isn't in the list of projects repos. Updating all repos instead." }
+          logger.info { "  GithubHook: The repository '#{params[:repository_id]}' isn't in the list of projects repos. Updating all repos instead." }
 
         else
           repositories = param_repo
