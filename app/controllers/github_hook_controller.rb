@@ -10,11 +10,17 @@ class GithubHookController < ApplicationController
       repositories = find_repositories
 
       repositories.each do |repository|
+            tg1 = Time.now
         # Fetch the changes from Github
         update_repository(repository)
-
+            tg2 = Time.now
+        
+            tr1 = Time.now
         # Fetch the new changesets into Redmine
         repository.fetch_changesets
+            tr2 = Time.now
+        
+        logger.info { "  GithubHook: Redmine repository updated: #{repository.identifier} (Git: #{time_diff_milli(tg1,tg2)}ms, Redmine: #{time_diff_milli(tr1,tr2)}ms)" }
       end
     end
 
@@ -30,6 +36,10 @@ class GithubHookController < ApplicationController
   def system(command)
     Kernel.system(command)
   end
+  
+  def time_diff_milli(start, finish)
+    ((finish - start) * 1000.0).round(1)
+  end
 
   # Executes shell command. Returns true if the shell command exits with a
   # success status code.
@@ -37,7 +47,7 @@ class GithubHookController < ApplicationController
   # If directory is given the current directory will be changed to that
   # directory before executing command.
   def exec(command, directory)
-    logger.debug { "GithubHook: Executing command: '#{command}'" }
+    logger.debug { "  GithubHook: Executing command: '#{command}'" }
 
     # Get a path to a temp file
     logfile = Tempfile.new('github_hook_exec')
@@ -54,9 +64,9 @@ class GithubHookController < ApplicationController
 
     output_from_command = File.readlines(logfile.path)
     if success
-      logger.debug { "GithubHook: Command output: #{output_from_command.inspect}"}
+      logger.debug { "  GithubHook: Command output: #{output_from_command.inspect}"}
     else
-      logger.error { "GithubHook: Command '#{command}' didn't exit properly. Full output: #{output_from_command.inspect}"}
+      logger.error { "  GithubHook: Command '#{command}' didn't exit properly. Full output: #{output_from_command.inspect}"}
     end
 
     return success
@@ -109,6 +119,22 @@ class GithubHookController < ApplicationController
 
     if repositories.nil? or repositories.length == 0
       raise TypeError, "Project '#{project.to_s}' ('#{project.identifier}') has no repository"
+    end
+    
+    # if a specific repository id is passed in url parameter "repo_id", then try to find it in
+    # the list of current project repositories and use only this and not all to pull changes from
+    # (issue #54)
+    if params.has_key?(:repo_id)
+      param_repo = repositories.select do |repo|
+        repo.identifier == params[:repo_id]
+      end
+      
+      if param_repo.nil? or param_repo.length == 0
+        logger.info { "  GithubHook: The repository '#{params[:repo_id]}' isn't in the list of projects repos. Updating all repos instead." }
+        
+      else
+        repositories = param_repo
+      end
     end
 
     return repositories
