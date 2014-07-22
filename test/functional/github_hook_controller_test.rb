@@ -90,91 +90,11 @@ class GithubHookControllerTest < ActionController::TestCase
     do_post
   end
 
-  def test_should_fetch_changes_from_origin
-    Project.expects(:find_by_identifier).with('github').returns(project)
-    GithubHook::Updater.any_instance.expects(:exec).with("git fetch origin", repository.url)
-    do_post
-  end
-
-  def test_should_reset_repository_when_fetch_origin_succeeds
-    Project.expects(:find_by_identifier).with('github').returns(project)
-    GithubHook::Updater.any_instance.expects(:exec).with("git fetch origin", repository.url).returns(true)
-    GithubHook::Updater.any_instance.expects(:exec).with("git fetch origin \"+refs/heads/*:refs/heads/*\"", repository.url)
-    do_post
-  end
-
-  def test_should_not_reset_repository_when_fetch_origin_fails
-    Project.expects(:find_by_identifier).with('github').returns(project)
-    GithubHook::Updater.any_instance.expects(:exec).with("git fetch origin", repository.url).returns(false)
-    GithubHook::Updater.any_instance.expects(:exec).with("git reset --soft refs\/remotes\/origin\/master", repository.url).never
-    do_post
-  end
-
-  def test_should_use_project_identifier_from_request
-    Project.expects(:find_by_identifier).with('redmine').returns(project)
-    GithubHook::Updater.any_instance.stubs(:exec).returns(true)
-    post :index, :project_id => 'redmine', :payload => json
-  end
-
-  def test_should_return_404_if_project_identifier_not_found
-    assert_raises ActiveRecord::RecordNotFound do
-      post :index
-    end
-  end
-
-  def test_should_downcase_identifier
-    # Redmine project identifiers are always downcase
-    Project.expects(:find_by_identifier).with('redmine').returns(project)
-    GithubHook::Updater.any_instance.stubs(:exec).returns(true)
-    post :index, :project_id => 'ReDmInE', :payload => json
-  end
-
   def test_should_render_ok_when_done
     GithubHook::Updater.any_instance.expects(:update_repository).returns(true)
     do_post
     assert_response :success
     assert_equal 'OK', @response.body
-  end
-
-  def test_should_fetch_changesets_into_the_repository
-    GithubHook::Updater.any_instance.expects(:update_repository).returns(true)
-    repository.expects(:fetch_changesets).returns(true)
-
-    do_post
-    assert_response :success
-    assert_equal 'OK', @response.body
-  end
-
-  def test_should_return_404_if_project_identifier_not_given
-    assert_raises ActiveRecord::RecordNotFound do
-      do_post :repository => {}
-    end
-  end
-
-  def test_should_return_404_if_project_not_found
-    assert_raises ActiveRecord::RecordNotFound do
-      Project.expects(:find_by_identifier).with('foobar').returns(nil)
-      do_post :repository => {:name => 'foobar'}
-    end
-  end
-
-  def test_should_return_500_if_project_has_no_repository
-    assert_raises TypeError do
-      project = mock('project', :to_s => 'My Project', :identifier => 'github')
-      project.expects(:repositories).returns([])
-      Project.expects(:find_by_identifier).with('github').returns(project)
-      do_post :repository => {:name => 'github'}
-    end
-  end
-
-  def test_should_return_500_if_repository_is_not_git
-    assert_raises TypeError do
-      project = mock('project', :to_s => 'My Project', :identifier => 'github')
-      repository = Repository::Subversion.new
-      project.expects(:repositories).at_least(1).returns([repository])
-      Project.expects(:find_by_identifier).with('github').returns(project)
-      do_post :repository => {:name => 'github'}
-    end
   end
 
   def test_should_not_require_login
