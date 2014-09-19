@@ -10,6 +10,11 @@ module GithubHook
     end
 
     def call
+      logger.info { "  GithubHook: Received POST request from GitHub." }
+
+      #write_debuglog
+      prepare_email
+
       repositories = find_repositories
 
       repositories.each do |repository|
@@ -37,6 +42,78 @@ module GithubHook
     end
 
     attr_reader :params, :payload
+
+    def write_debuglog()
+
+      begin
+        file = File.open("/tmp/github_mailer.json", "w")
+        file.write(payload)
+      rescue IOError => e
+        # some error occured, directory not writable etc.
+      ensure
+        file.close unless file == nil
+      end
+
+    end
+
+    def prepare_email()
+
+      commitmsg = ""
+      home = payload['repository']['full_name']
+      branch = payload['ref']
+      url =  payload['repository']['url']
+      compare = payload['compare']
+
+      forks = payload['repository']['forks']
+      watchers = payload['repository']['watchers']
+      issues = payload['repository']['open_issues']
+      defbranch = payload['repository']['default_branch']
+
+      logger.info { "  GithubHook: #{home} #{branch} #{url} #{compare}" }
+      logger.info { "  GithubHook: #{forks} #{watchers} #{issues} #{defbranch}" }
+
+      # parse commits
+      payload['commits'].each do |item|
+
+        commitmsg = "Commit: #{item['id']}\n#{item['url']}\nAuthor: #{item['author']['name']} <#{item['author']['email']}>\nDate: #{item['timestamp']}\n\nChanged Paths:\n----------------------\n"
+
+        item['added'].each do |added|
+          commitmsg = "#{commitmsg}A #{added}\n"
+        end
+        item['modified'].each do |mod|
+          commitmsg = "#{commitmsg}M #{mod}\n"
+        end
+        item['removed'].each do |rem|
+          commitmsg = "#{commitmsg}R #{rem}\n"
+        end
+        commitmsg = "#{commitmsg}\nLog Message:\n-------------------\n#{item['message']}\n"
+
+      end
+
+      logger.info { "  GithubHook: Commits: #{commitmsg}" }
+
+      # create e-mail subject and body
+      subject = "[#{home}] #{payload['commits'][0]['message']}"
+
+      stats = "Project Statistics:\n-----------------------\nForks: #{forks}\nWatchers: #{watchers}\nOpen Issues: #{issues}\n\n"
+      emailmsg = "Branch: #{branch}\nProject Home: #{url}\n#{commitmsg}\nCompare: #{compare}\n\n#{stats}\n"
+
+      logger.info { "  GithubHook: Subject: #{subject}" }
+      logger.info { "  GithubHook: Body   : #{emailmsg}" }
+
+      send_email('ron@cyberjunky.nl, jesse.kerkhoven@gmail.com, ualex73@gmail.com, wouter@wolkers.nl', subject, emailmsg)
+
+    end
+
+    def send_email(to, subject, body)
+      to = to
+      subject = subject
+      body = body
+`mail -s "#{subject}" "#{to}" -aFrom:support@domotiga.nl<<EOM
+#{body}
+EOM`
+
+    end
 
     # Executes shell command. Returns true if the shell command exits with a
     # success status code.

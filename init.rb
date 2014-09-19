@@ -7,4 +7,10 @@ Redmine::Plugin.register :redmine_github_hook do
   url 'https://github.com/koppen/redmine_github_hook'
   author_url 'http://mentalized.net'
   version RedmineGithubHook::VERSION
+
+  settings :default => {
+      :email_recipients => ''
+  },
+  :partial => 'settings/github_hook'
+  
 end
