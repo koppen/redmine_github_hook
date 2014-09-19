@@ -12,8 +12,9 @@ module GithubHook
     def call
       logger.info { "  GithubHook: Received POST request from GitHub." }
 
-      #write_debuglog
-      prepare_email
+      unless Setting.plugin_redmine_github_hook['email_recipients'].nil? or Setting.plugin_redmine_github_hook['email_recipients'].empty?
+        prepare_email
+      end
 
       repositories = find_repositories
 
@@ -42,19 +43,6 @@ module GithubHook
     end
 
     attr_reader :params, :payload
-
-    def write_debuglog()
-
-      begin
-        file = File.open("/tmp/github_mailer.json", "w")
-        file.write(payload)
-      rescue IOError => e
-        # some error occured, directory not writable etc.
-      ensure
-        file.close unless file == nil
-      end
-
-    end
 
     def prepare_email()
 
@@ -95,21 +83,26 @@ module GithubHook
       # create e-mail subject and body
       subject = "[#{home}] #{payload['commits'][0]['message']}"
 
-      stats = "Project Statistics:\n-----------------------\nForks: #{forks}\nWatchers: #{watchers}\nOpen Issues: #{issues}\n\n"
+      stats = "Project Statistics:\n-----------------------\nForks: #{forks}\nWatchers: #{watchers}\nOpen Issues: #{issues}"
       emailmsg = "Branch: #{branch}\nProject Home: #{url}\n#{commitmsg}\nCompare: #{compare}\n\n#{stats}\n"
 
       logger.info { "  GithubHook: Subject: #{subject}" }
       logger.info { "  GithubHook: Body   : #{emailmsg}" }
 
-      send_email('ron@cyberjunky.nl, jesse.kerkhoven@gmail.com, ualex73@gmail.com, wouter@wolkers.nl', subject, emailmsg)
+      send_email(Setting.plugin_redmine_github_hook['email_recipients'], subject, emailmsg)
 
     end
 
     def send_email(to, subject, body)
+
       to = to
       subject = subject
       body = body
-`mail -s "#{subject}" "#{to}" -aFrom:support@domotiga.nl<<EOM
+      from = Setting.plugin_redmine_github_hook['email_from']
+
+      logger.info { "  GithubHook: #{from}" }
+
+`mail -s "#{subject}" "#{to}" -a "From:#{from}" <<EOM
 #{body}
 EOM`
 

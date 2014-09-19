@@ -2,4 +2,7 @@
   <label>e-mail recipient(s)</label>
   <%= text_field_tag 'settings[email_recipients]', @settings[:email_recipients] %>
   <em class="info">One or more addresses separated by a comma</em>
+  <label>e-mail from address</label>
+  <%= text_field_tag 'settings[email_from]', @settings[:email_from] %>
+  <em class="info">Specify the from address</em>
 </p>
