@@ -29,13 +29,6 @@ module GithubHook
 
     private
 
-    class NullLogger
-      def debug(*_); end
-      def info(*_); end
-      def warn(*_); end
-      def error(*_); end
-    end
-
     attr_reader :params, :payload
 
     # Executes shell command. Returns true if the shell command exits with a
