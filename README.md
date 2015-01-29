@@ -93,7 +93,7 @@ The interactions between the different parts of the process is outlined in the f
 
 ![sequence](https://cloud.githubusercontent.com/assets/6480/3311503/3a789390-f6c5-11e3-804d-d5ca2562799f.png)
 
-(Diagram made with [http://bramp.github.io/js-sequence-diagrams/](js-sequence-diagrams)).
+(Diagram made with [js-sequence-diagrams](http://bramp.github.io/js-sequence-diagrams/)).
 
 
 ## License
