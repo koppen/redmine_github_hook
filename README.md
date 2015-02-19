@@ -20,7 +20,7 @@ You have two options for installing the plugin:
 #### A: As a RubyGem
 
 1. Add the gem to your Gemfile.local:
-   `gem "redmine_github_hook"`
+   `gem install "redmine_github_hook"`
 2. `bundle`
 3. Restart your Redmine
 
