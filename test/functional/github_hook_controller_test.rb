@@ -83,6 +83,16 @@ class GithubHookControllerTest < ActionController::TestCase
     assert_equal 'OK', @response.body
   end
 
+  def test_should_render_error_message
+    GithubHook::Updater.any_instance.expects(:update_repository).raises(ActiveRecord::RecordNotFound.new("Repository not found"))
+    do_post
+    assert_response :not_found
+    assert_equal({
+      "title" => "ActiveRecord::RecordNotFound",
+      "message" => "Repository not found"
+    }, JSON.parse(@response.body))
+  end
+
   def test_should_not_require_login
     GithubHook::Updater.any_instance.expects(:update_repository).returns(true)
     @controller.expects(:check_if_login_required).never
