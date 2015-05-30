@@ -4,12 +4,7 @@ class GithubHookController < ApplicationController
   skip_before_filter :verify_authenticity_token, :check_if_login_required
 
   def index
-    if request.post?
-      payload = JSON.parse(params[:payload] || '{}')
-      updater = GithubHook::Updater.new(payload, params)
-      updater.logger = logger
-      updater.call
-    end
+    update_repository if request.post?
 
     render(:text => 'OK')
   rescue ActiveRecord::RecordNotFound => error
@@ -24,6 +19,10 @@ class GithubHookController < ApplicationController
 
   private
 
+  def parse_payload
+    JSON.parse(params[:payload] || "{}")
+  end
+
   def render_error_as_json(error, status)
     render(
       :json => {
@@ -32,5 +31,11 @@ class GithubHookController < ApplicationController
       },
       :status => status
     )
+  end
+
+  def update_repository
+    updater = GithubHook::Updater.new(parse_payload, params)
+    updater.logger = logger
+    updater.call
   end
 end
