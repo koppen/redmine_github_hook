@@ -15,21 +15,10 @@ That approach works perfectly fine, but is a bit heavy-handed and cumbersome. Th
 
 ### 1. Install the plugin
 
-You have two options for installing the plugin:
-
-#### A: As a RubyGem
-
 1. Add the gem to your Gemfile.local:
    `gem "redmine_github_hook"`
 2. `bundle`
 3. Restart your Redmine
-
-#### B: As a plugin
-
-1. Follow the plugin installation procedure outlined in the [Redmine wiki](http://www.redmine.org/wiki/redmine/Plugins).
-  * Make sure that Redmine GitHub Hook is installed in a directory named `redmine_github_hook`
-  * Easiest way: change in your plugins directory and pull with git: `git clone git://github.com/koppen/redmine_github_hook.git`
-2. Restart your Redmine.
 
 ### 2. Add the repository to Redmine
 
