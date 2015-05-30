@@ -171,4 +171,15 @@ class GithubHookUpdaterTest < Test::Unit::TestCase
 
     updater.call
   end
+
+  def test_logs_if_a_message_logger_is_given
+    updater = GithubHook::Updater.new(payload)
+    updater.stubs(:exec).returns(true)
+
+    logger = GithubHook::MessageLogger.new
+    updater.logger = logger
+
+    updater.call
+    assert logger.messages.any?, "Should have received messages"
+  end
 end

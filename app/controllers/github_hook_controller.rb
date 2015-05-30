@@ -4,11 +4,14 @@ class GithubHookController < ApplicationController
   skip_before_filter :verify_authenticity_token, :check_if_login_required
 
   def index
-    update_repository if request.post?
+    message_logger = GithubHook::MessageLogger.new(logger)
+    update_repository(message_logger) if request.post?
+    messages = message_logger.messages.map { |log| log[:message] }
+    render(:json => messages)
 
-    render(:text => 'OK')
   rescue ActiveRecord::RecordNotFound => error
     render_error_as_json(error, 404)
+
   rescue TypeError => error
     render_error_as_json(error, 412)
   end
@@ -33,7 +36,7 @@ class GithubHookController < ApplicationController
     )
   end
 
-  def update_repository
+  def update_repository(logger)
     updater = GithubHook::Updater.new(parse_payload, params)
     updater.logger = logger
     updater.call
