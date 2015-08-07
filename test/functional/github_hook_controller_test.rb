@@ -76,11 +76,11 @@ class GithubHookControllerTest < ActionController::TestCase
     post :index, :payload => json
   end
 
-  def test_should_render_ok_when_done
+  def test_should_render_response_from_github_hook_when_done
     GithubHook::Updater.any_instance.expects(:update_repository).returns(true)
     do_post
     assert_response :success
-    assert_equal 'OK', @response.body
+    assert_match "GithubHook: Redmine repository updated", @response.body
   end
 
   def test_should_render_error_message
