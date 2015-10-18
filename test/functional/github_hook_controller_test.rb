@@ -84,7 +84,10 @@ class GithubHookControllerTest < ActionController::TestCase
   end
 
   def test_should_render_error_message
-    GithubHook::Updater.any_instance.expects(:update_repository).raises(ActiveRecord::RecordNotFound.new("Repository not found"))
+    GithubHook::Updater
+      .any_instance
+      .expects(:update_repository)
+      .raises(ActiveRecord::RecordNotFound.new("Repository not found"))
     do_post
     assert_response :not_found
     assert_equal({

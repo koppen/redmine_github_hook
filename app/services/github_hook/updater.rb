@@ -64,7 +64,8 @@ module GithubHook
       logfile.unlink if logfile && logfile.respond_to?(:unlink)
     end
 
-    # Finds the Redmine project in the database based on the given project identifier
+    # Finds the Redmine project in the database based on the given project
+    # identifier
     def find_project
       identifier = get_identifier
       project = Project.find_by_identifier(identifier.downcase)
@@ -80,12 +81,15 @@ module GithubHook
       end
 
       if repositories.nil? || repositories.length == 0
-        fail TypeError, "Project '#{project}' ('#{project.identifier}') has no repository"
+        fail(
+          TypeError,
+          "Project '#{project}' ('#{project.identifier}') has no repository"
+        )
       end
 
-      # if a specific repository id is passed in url parameter "repository_id", then try to find it in
-      # the list of current project repositories and use only this and not all to pull changes from
-      # (issue #54)
+      # if a specific repository id is passed in url parameter "repository_id",
+      # then try to find it in the list of current project repositories and use
+      # only this and not all to pull changes from (issue #54)
       if params.key?(:repository_id)
         param_repo = repositories.select do |repo|
           repo.identifier == params[:repository_id]
@@ -102,18 +106,21 @@ module GithubHook
       repositories
     end
 
-    # Gets the project identifier from the querystring parameters and if that's not supplied, assume
-    # the Github repository name is the same as the project identifier.
+    # Gets the project identifier from the querystring parameters and if that's
+    # not supplied, assume the Github repository name is the same as the project
+    # identifier.
     def get_identifier
       identifier = get_project_name
       fail ActiveRecord::RecordNotFound, "Project identifier not specified" if identifier.nil?
       identifier
     end
 
-    # Attempts to find the project name. It first looks in the params, then in the
-    # payload if params[:project_id] isn't given.
+    # Attempts to find the project name. It first looks in the params, then in
+    # the payload if params[:project_id] isn't given.
     def get_project_name
-      params[:project_id] || (payload["repository"] ? payload["repository"]["name"] : nil)
+      project_id = params[:project_id]
+      name_from_repository = payload.fetch("repository", {}).fetch("name", nil)
+      project_id || name_from_repository
     end
 
     def git_command(command)
@@ -136,7 +143,9 @@ module GithubHook
     def update_repository(repository)
       command = git_command("fetch origin")
       if exec(command, repository.url)
-        command = git_command("fetch --prune origin \"+refs/heads/*:refs/heads/*\"")
+        command = git_command(
+          "fetch --prune origin \"+refs/heads/*:refs/heads/*\""
+        )
         exec(command, repository.url)
       end
     end
