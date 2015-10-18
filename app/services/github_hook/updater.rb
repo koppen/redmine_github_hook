@@ -69,7 +69,10 @@ module GithubHook
     def find_project
       identifier = get_identifier
       project = Project.find_by_identifier(identifier.downcase)
-      fail ActiveRecord::RecordNotFound, "No project found with identifier '#{identifier}'" if project.nil?
+      fail(
+        ActiveRecord::RecordNotFound,
+        "No project found with identifier '#{identifier}'"
+      ) if project.nil?
       project
     end
 
@@ -96,7 +99,10 @@ module GithubHook
         end
 
         if param_repo.nil? || param_repo.length == 0
-          logger.info { "  GithubHook: The repository '#{params[:repository_id]}' isn't in the list of projects repos. Updating all repos instead." }
+          logger.info {
+            "GithubHook: The repository '#{params[:repository_id]}' isn't " \
+            "in the list of projects repos. Updating all repos instead."
+          }
 
         else
           repositories = param_repo
@@ -111,7 +117,10 @@ module GithubHook
     # identifier.
     def get_identifier
       identifier = get_project_name
-      fail ActiveRecord::RecordNotFound, "Project identifier not specified" if identifier.nil?
+      fail(
+        ActiveRecord::RecordNotFound,
+        "Project identifier not specified"
+      ) if identifier.nil?
       identifier
     end
 
