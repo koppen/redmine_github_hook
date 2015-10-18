@@ -79,16 +79,7 @@ module GithubHook
     # Returns the Redmine Repository object we are trying to update
     def find_repositories
       project = find_project
-      repositories = project.repositories.select do |repo|
-        repo.is_a?(Repository::Git)
-      end
-
-      if repositories.nil? || repositories.length == 0
-        fail(
-          TypeError,
-          "Project '#{project}' ('#{project.identifier}') has no repository"
-        )
-      end
+      repositories = git_repositories(project)
 
       # if a specific repository id is passed in url parameter "repository_id",
       # then try to find it in the list of current project repositories and use
@@ -134,6 +125,19 @@ module GithubHook
 
     def git_command(command)
       GIT_BIN + " #{command}"
+    end
+
+    def git_repositories(project)
+      repositories = project.repositories.select do |repo|
+        repo.is_a?(Repository::Git)
+      end
+      if repositories.empty?
+        fail(
+          TypeError,
+          "Project '#{project}' ('#{project.identifier}') has no repository"
+        )
+      end
+      repositories || []
     end
 
     def logger
