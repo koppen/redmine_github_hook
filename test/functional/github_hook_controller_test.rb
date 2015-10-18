@@ -1,7 +1,7 @@
-require 'test_helper'
+require "test_helper"
 
-require 'test/unit'
-require 'mocha'
+require "test/unit"
+require "mocha"
 
 class GithubHookControllerTest < ActionController::TestCase
   def json
@@ -65,7 +65,7 @@ class GithubHookControllerTest < ActionController::TestCase
   end
 
   def setup
-    Project.stubs(:find_by_identifier).with('github').returns(project)
+    Project.stubs(:find_by_identifier).with("github").returns(project)
 
     # Make sure we don't run actual commands in test
     GithubHook::Updater.any_instance.expects(:system).never
@@ -88,9 +88,9 @@ class GithubHookControllerTest < ActionController::TestCase
     do_post
     assert_response :not_found
     assert_equal({
-      "title" => "ActiveRecord::RecordNotFound",
-      "message" => "Repository not found"
-    }, JSON.parse(@response.body))
+                   "title" => "ActiveRecord::RecordNotFound",
+                   "message" => "Repository not found"
+                 }, JSON.parse(@response.body))
   end
 
   def test_should_not_require_login
@@ -115,5 +115,4 @@ class GithubHookControllerTest < ActionController::TestCase
     get :index
     assert_response :success
   end
-
 end
