@@ -65,6 +65,8 @@ class GithubHookControllerTest < ActionController::TestCase
   end
 
   def setup
+    Setting.sys_api_enabled = '1'
+    Setting.sys_api_key = 'my_secret_key'
     Project.stubs(:find_by_identifier).with("github").returns(project)
 
     # Make sure we don't run actual commands in test
@@ -72,8 +74,12 @@ class GithubHookControllerTest < ActionController::TestCase
     Repository.expects(:fetch_changesets).never
   end
 
-  def do_post
-    post :index, :payload => json
+  def teardown
+    Setting.clear_cache
+  end
+
+  def do_post(key: 'my_secret_key')
+    post :index, :payload => json, :key => key
   end
 
   def test_should_render_response_from_github_hook_when_done
@@ -81,6 +87,27 @@ class GithubHookControllerTest < ActionController::TestCase
     do_post
     assert_response :success
     assert_match "GithubHook: Redmine repository updated", @response.body
+  end
+
+  def test_should_render_response_from_github_hook_when_done_with_empty_sys_api_key
+    GithubHook::Updater.any_instance.expects(:update_repository).returns(true)
+    with_settings :sys_api_key => '' do
+      do_post :key => 'wrong_key'
+    end
+    assert_response :success
+    assert_match "GithubHook: Redmine repository updated", @response.body
+  end
+
+  def test_disabled_ws_should_respond_with_403
+    with_settings :sys_api_enabled => '0' do
+      do_post
+      assert_response 403
+    end
+  end
+
+  def test_wrong_key_should_respond_with_403
+    do_post :key => 'wrong_key'
+    assert_response 403
   end
 
   def test_should_render_error_message
@@ -115,7 +142,12 @@ class GithubHookControllerTest < ActionController::TestCase
   end
 
   def test_should_respond_to_get
-    get :index
+    get :index, :key => 'my_secret_key'
     assert_response :success
+  end
+
+  def test_wrong_key_should_respond_to_get_with_403
+    get :index, :key => 'wrong_key'
+    assert_response 403
   end
 end
