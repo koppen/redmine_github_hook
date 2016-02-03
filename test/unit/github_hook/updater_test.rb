@@ -1,9 +1,9 @@
 require "test_helper"
 
-require "test/unit"
+require "minitest"
 require "mocha"
 
-class GithubHookUpdaterTest < Test::Unit::TestCase
+class GithubHookUpdaterTest < MiniTest::Unit::TestCase
   def project
     return @project if @project
 

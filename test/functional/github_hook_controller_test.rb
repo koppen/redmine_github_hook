@@ -1,6 +1,6 @@
 require "test_helper"
 
-require "test/unit"
+require "minitest"
 require "mocha"
 
 class GithubHookControllerTest < ActionController::TestCase
