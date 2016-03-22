@@ -1,6 +1,6 @@
 require "test_helper"
 
-require "minitest"
+require "minitest/autorun"
 require "mocha"
 
 class GithubHookUpdaterTest < Minitest::Test

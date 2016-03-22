@@ -1,5 +1,5 @@
 # require 'test_helper'
-require "minitest"
+require "minitest/autorun"
 require_relative "../../../app/services/github_hook/message_logger"
 
 class MessageLoggerTest < Minitest::Test
