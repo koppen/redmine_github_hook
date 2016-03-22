@@ -101,6 +101,12 @@ class GithubHookUpdaterTest < Minitest::Test
     updater.call
   end
 
+  def test_uses_project_identifier_from_request_as_numeric
+    Project.expects(:find_by_identifier).with("42").returns(project)
+    updater = build_updater(payload, :project_id => 42)
+    updater.call
+  end
+
   def test_updates_all_repositories_by_default
     another_repository = Repository::Git.new
     another_repository.expects(:fetch_changesets).returns(true)

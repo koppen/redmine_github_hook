@@ -112,7 +112,7 @@ module GithubHook
         ActiveRecord::RecordNotFound,
         "Project identifier not specified"
       ) if identifier.nil?
-      identifier
+      identifier.to_s
     end
 
     # Attempts to find the project name. It first looks in the params, then in
