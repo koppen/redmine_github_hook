@@ -2,7 +2,7 @@
 require "minitest"
 require_relative "../../../app/services/github_hook/message_logger"
 
-class MessageLoggerTest < MiniTest::Unit::TestCase
+class MessageLoggerTest < Minitest::Test
   def setup
     @logger = GithubHook::MessageLogger.new
   end

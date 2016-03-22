@@ -3,7 +3,7 @@ require "test_helper"
 require "minitest"
 require "mocha"
 
-class GithubHookUpdaterTest < MiniTest::Unit::TestCase
+class GithubHookUpdaterTest < Minitest::Test
   def project
     return @project if @project
 
