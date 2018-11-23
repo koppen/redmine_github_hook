@@ -1,6 +1,7 @@
 require "json"
 
 class GithubHookController < ApplicationController
+  before_filter :check_enabled
   skip_before_filter :verify_authenticity_token, :check_if_login_required
 
   def index
@@ -40,5 +41,13 @@ class GithubHookController < ApplicationController
     updater = GithubHook::Updater.new(parse_payload, params)
     updater.logger = logger
     updater.call
+  end
+
+  def check_enabled
+    User.current = nil
+    unless Setting.sys_api_enabled? && (Setting.sys_api_key.empty? || params[:key].to_s == Setting.sys_api_key)
+      render :text => 'Access denied. Repository management WS is disabled or key is invalid.', :status => 403
+      return false
+    end
   end
 end
