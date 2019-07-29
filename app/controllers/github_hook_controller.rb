@@ -1,7 +1,7 @@
 require "json"
 
 class GithubHookController < ApplicationController
-  skip_before_filter :verify_authenticity_token, :check_if_login_required
+  skip_before_action :verify_authenticity_token, :check_if_login_required
 
   def index
     message_logger = GithubHook::MessageLogger.new(logger)
