@@ -73,7 +73,7 @@ class GithubHookControllerTest < ActionController::TestCase
   end
 
   def do_post
-    post :index, :payload => json
+    post :index, :params => {:payload => json}
   end
 
   def test_should_render_response_from_github_hook_when_done
