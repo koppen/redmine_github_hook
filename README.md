@@ -87,7 +87,7 @@ The interactions between the different parts of the process is outlined in the f
 
 ## License
 
-Copyright (c) 2009-2014 Jakob Skjerning
+Copyright (c) 2009-2019 Jakob Skjerning
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
