@@ -77,7 +77,7 @@ class GithubHookUpdaterTest < Minitest::Test
     updater
       .expects(:exec)
       .with(
-        "git fetch --prune origin \"+refs/heads/*:refs/heads/*\"",
+        "git fetch --prune --prune-tags origin \"+refs/heads/*:refs/heads/*\"",
         repository.url
       )
     updater.call
