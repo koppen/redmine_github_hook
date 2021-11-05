@@ -159,7 +159,7 @@ module GithubHook
       return nil unless fetch
 
       command = git_command(
-        "fetch --prune origin \"+refs/heads/*:refs/heads/*\""
+        "fetch --prune --prune-tags origin \"+refs/heads/*:refs/heads/*\""
       )
       exec(command, repository.url)
     end
