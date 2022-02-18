@@ -88,10 +88,17 @@ The user running Redmine needs permissions to read and write to the local reposi
 
 The interactions between the different parts of the process is outlined in the following sequence diagram:
 
-![sequence](https://cloud.githubusercontent.com/assets/6480/3311503/3a789390-f6c5-11e3-804d-d5ca2562799f.png)
-
-(Diagram made with [js-sequence-diagrams](http://bramp.github.io/js-sequence-diagrams/)).
-
+```mermaid
+sequenceDiagram
+    participant Dev as Development Machine
+    participant GH as GitHub
+    participant Rm as Redmine
+    Dev->>GH: git push
+    GH->>Rm: POST /github_hook
+    Rm->>GH: git fetch
+    GH-->>Rm: commits
+    Rm->>Rm: Update repository
+```
 
 ## License
 
