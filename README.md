@@ -2,6 +2,12 @@
 
 This plugin allows you to update your local Git repositories in Redmine when changes have been pushed to GitHub.
 
+## Project Status: Looking for maintainers
+
+This project is not under active development, although I will continue to provide support for current users, but you can change that by joining the team.
+
+If you use this project and would like to develop it further, please introduce yourself on the [maintainers wanted ticket](https://github.com/koppen/redmine_github_hook/issues/96).
+
 ## Description
 
 [Redmine](http://redmine.org) has supported Git repositories for a long time, allowing you to browse your code and view your changesets directly in Redmine. For this purpose, Redmine relies on local clones of the Git repositories.
