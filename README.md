@@ -1,5 +1,7 @@
 # Redmine GitHub Hook
 
+[![Maintainers Wanted](https://img.shields.io/badge/maintainers-wanted-red.svg)](https://github.com/pickhardt/maintainers-wanted)
+
 This plugin allows you to update your local Git repositories in Redmine when changes have been pushed to GitHub.
 
 ## Project Status: Looking for maintainers
