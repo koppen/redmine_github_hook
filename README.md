@@ -26,7 +26,8 @@ That approach works perfectly fine, but is a bit heavy-handed and cumbersome. Th
 1. Add the gem to your Gemfile.local:
    `gem "redmine_github_hook"`
 2. `bundle`
-3. Restart your Redmine
+3. Run migrations: `bundle exec rake redmine:plugins:migrate RAILS_ENV=production`
+4. Restart your Redmine
 
 ### 2. Add the repository to Redmine
 
