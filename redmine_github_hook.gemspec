@@ -5,7 +5,7 @@ require "redmine_github_hook/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "redmine_github_hook"
-  spec.version       = RedmineGithubHook::VERSION
+  spec.version       = RedmineGithubHook::Version
   spec.authors       = ["Jakob Skjerning"]
   spec.email         = ["jakob@mentalized.net"]
   spec.summary       = "Allow your Redmine installation to be notified when changes have been pushed to a Github repository."

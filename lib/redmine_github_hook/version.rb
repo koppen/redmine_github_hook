@@ -1,3 +1,3 @@
 module RedmineGithubHook
-  VERSION = "3.0.1"
+  Version = "3.0.1"
 end
