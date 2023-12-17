@@ -192,10 +192,7 @@ module GitHook
             comment << "---\n\n"
             comment << "\"View on Git\":#{params[:object_attributes][:url]}"
           end
-          child.init_journal(reviewer, comment)
-          child.status_id = setting.remark_issue_closed_status
-          child.save
-          child.reload
+          close_child(reviewer, setting, child, comment)
           log_info("Redmine remark issue closed. '#{child}'")
         else
           comment << "\n\n"
@@ -223,6 +220,7 @@ module GitHook
         description << "\"View on Git\":#{params[:object_attributes][:url]} \n\n"
         description << "{{collapse(Please do not edit the following.)\n"
         description << "_discussion_id=#{params[:object_attributes][:discussion_id]}\n"
+        description << "_blocking_discussions_resolved=#{params[:merge_request][:blocking_discussions_resolved]}\n"
         description << "}} "
         subject = description.partition("\n")[0]
         child = Issue.new(
@@ -245,8 +243,9 @@ module GitHook
     end
 
     def update_review_issue_by_GitLab_merge_request(setting)
-      if params[:object_attributes][:action] != "merge"
-        log_info("Only 'merge' action is supported.")
+      action = params[:object_attributes][:action]
+      if action != "merge" && action != "update"
+        log_info("'#{action}' action is not supported.")
         return
       end
 
@@ -259,21 +258,17 @@ module GitHook
         return
       end
 
-      children = parent.children.where('tracker_id = ? AND status_id != ? AND description like ?',
-        setting.remark_issue_tracker, setting.remark_issue_closed_status, "%_discussion_id=%")
-      if children.present? && children.any?
-        comment = "This issue was closed because the merge request was merged.\n\n"
-        comment << "---\n\n"
-        comment << "\"View on Git\":#{params[:object_attributes][:url]}"
-        children.each do |child|
-          child.init_journal(reviewer, comment)
-          child.status_id = setting.remark_issue_closed_status
-          child.save
-          child.reload
+      if action == "merge"
+        children = find_children(parent, setting, "_blocking_discussions_resolved=")
+        close_children(reviewer, setting, children, "This issue was closed because the merge request was merged.")
+      elsif action = "update"
+        resolved = params[:object_attributes][:blocking_discussions_resolved]
+        if resolved
+          children = find_children(parent, setting, "_blocking_discussions_resolved=false")
+          close_children(reviewer, setting, children, "This issue was closed because all threads are resolved.")
+        else
+          log_info("Some threads has not been resolved.")
         end
-        log_info("Redmine remark issue(s) closed. #{children.map { |child| "'#{child}'" }.join(', ')}")
-      else
-        log_info("No remark issues that need to close.")
       end
     end
 
@@ -290,5 +285,32 @@ module GitHook
       return Issue.where('project_id = ? AND description like ?',
         project.id, "%_#{request_keyword}=#{request_url}%").last
     end
+
+    def close_child(reviewer, setting, child, comment)
+      child.init_journal(reviewer, comment)
+      child.status_id = setting.remark_issue_closed_status
+      child.save
+      child.reload
+    end
+
+    def find_children(parent, setting, description)
+      return parent.children.where('tracker_id = ? AND status_id != ? AND description like ?',
+        setting.remark_issue_tracker, setting.remark_issue_closed_status, "%#{description}%")
+    end
+
+    def close_children(reviewer, setting, children, comment)
+      if children.present? && children.any?
+        comment << "\n\n"
+        comment << "---\n\n"
+        comment << "\"View on Git\":#{params[:object_attributes][:url]}"
+        children.each do |child|
+          close_child(reviewer, setting, child, comment)
+        end
+        log_info("Redmine remark issue(s) closed. #{children.map { |child| "'#{child}'" }.join(', ')}")
+      else
+        log_info("No remark issues that need to close.")
+      end
+    end
+
   end
 end
