@@ -1,4 +1,4 @@
-module GithubHook
+module GitHook
   class NullLogger
     def debug(*_); end
 

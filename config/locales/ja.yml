@@ -1,0 +1,20 @@
+ja:
+  gh_label_git_hook_setting: "Git Webhookとの連携"
+  gh_label_git_hook_setting_new: "新しいGit Webhookとの連携"
+  gh_label_git_hook_setting_plural: "Git Webhookとの連携"
+  gh_label_remark_issue: "指摘チケット"
+
+  gh_field_title: "タイトル"
+  gh_field_is_enabled: "有効"
+  gh_field_project_pattern: "対象プロジェクト"
+
+  gh_field_remark_issue_tracker: "トラッカー"
+  gh_field_remark_issue_closed_status: "終了時のステータス"
+  gh_field_keyword_to_resolve_discussion: "終了用のキーワード"
+
+  gh_text_title_info: "管理する上でわかりやすい名前を入力してください。"
+  gh_text_project_pattern_info: "本設定を適用するプロジェクト(識別子)を正規表現で指定します。 (例 proj-a|proj-b)"
+
+  gh_text_remark_issue_tracker_info: "指摘チケットのトラッカーを指定します。"
+  gh_text_remark_issue_closed_status_info: "指摘チケットの終了時のステータスを指定します。"
+  gh_text_keyword_to_resolve_discussion_info: "マージリクエストのスレッドを終了するためのキーワードを指定します。このキーワードを含むコメントが追加されると指摘チケットを終了します。"

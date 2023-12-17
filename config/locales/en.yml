@@ -1,0 +1,20 @@
+en:
+  gh_label_git_hook_setting: "Git Webhook Linkage"
+  gh_label_git_hook_setting_new: "New Git Webhook Linkage"
+  gh_label_git_hook_setting_plural: "Git Webhook Linkage"
+  gh_label_remark_issue: "Remark Issues"
+
+  gh_field_title: "Title"
+  gh_field_is_enabled: "Enabled"
+  gh_field_project_pattern: "Target Projects"
+
+  gh_field_remark_issue_tracker: "Tracker"
+  gh_field_remark_issue_closed_status: "Closed Status"
+  gh_field_keyword_to_resolve_discussion: "Keywords to resolve"
+
+  gh_text_title_info: "Please enter a clear name to manage."
+  gh_text_project_pattern_info: "Project (identifier) pattern you wish to apply this setting is specified with a regular expression. (e.g. proj-a|proj-b)"
+
+  gh_text_remark_issue_tracker_info: "Please specify the tracker of a remark issue."
+  gh_text_remark_issue_closed_status_info: "Please specify the closed status of a remark issue."
+  gh_text_keyword_to_resolve_discussion_info: "Please specify the keywords to resolve a thread on merge request. If the comment with this keywords are added, the linked remark issue will be closed."

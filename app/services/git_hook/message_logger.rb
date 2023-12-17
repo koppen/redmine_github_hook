@@ -1,4 +1,4 @@
-module GithubHook
+module GitHook
   class MessageLogger
     attr_reader :messages, :wrapped_logger
 

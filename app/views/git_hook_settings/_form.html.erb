@@ -1,0 +1,76 @@
+
+<%= error_messages_for 'git_hook_setting' %>
+
+<div class="box tabular">
+  <%# タイトル %>
+  <p>
+    <%= form.text_field :title,
+        :label => l(:gh_field_title),
+        :size => 100,
+        :required => true,
+        :disabled => (disabled || false)  %>
+    <em class="info">
+      <%= l(:gh_text_title_info) %>
+    </em>
+  </p>
+  <%# 有効 %>
+  <p>
+    <%= form.check_box :is_enabled,
+        :label => l(:gh_field_is_enabled),
+        :disabled => (disabled || false) %>
+  </p>
+  <%# 対象プロジェクト %>
+  <p>
+    <%= form.text_field :project_pattern,
+        :label => l(:gh_field_project_pattern),
+        :size => 100,
+        :required => true,
+        :disabled => (disabled || false) %>
+    <em class="info">
+      <%= l(:gh_text_project_pattern_info) %>
+    </em>
+  </p>
+  <%= field_set_tag l(:gh_label_remark_issue) do %>
+    <%# 指摘チケットのトラッカー %>
+    <p>
+      <%= form.select :remark_issue_tracker,
+            options_for_select(
+              [""] + Tracker.all.map{|t| [t.name, t.id]},
+              :selected => @git_hook_setting.remark_issue_tracker),
+              { :label => l(:gh_field_remark_issue_tracker),
+                :required => true, },
+              :disabled => (disabled || false) %>
+      <em class="info">
+        <%= l(:gh_text_remark_issue_tracker_info) %>
+      </em>
+    </p>
+
+    <%# 指摘チケットの終了時のステータス %>
+    <p>
+      <%= form.select :remark_issue_closed_status,
+            options_for_select(
+              [""] + IssueStatus.all.map{|t| [t.name, t.id]},
+              :selected => @git_hook_setting.remark_issue_closed_status),
+              { :label => l(:gh_field_remark_issue_closed_status),
+                :required => true, },
+              :disabled => (disabled || false) %>
+      <em class="info">
+        <%= l(:gh_text_remark_issue_closed_status_info) %>
+      </em>
+    </p>
+
+    <%# 一連の指摘の終了を表すためのキーワード %>
+    <p>
+      <%= form.text_field :keyword_to_resolve_discussion,
+          :label => l(:gh_field_keyword_to_resolve_discussion),
+          :size => 100,
+          :required => true,
+          :disabled => (disabled || false) %>
+      <em class="info">
+        <%= l(:gh_text_keyword_to_resolve_discussion_info) %><br />
+      </em>
+    </p>
+
+  <% end %><br />
+
+</div>

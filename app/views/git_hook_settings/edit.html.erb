@@ -1,0 +1,9 @@
+<%= title [l(:gh_label_git_hook_setting_plural), git_hook_settings_path], @git_hook_setting.id %>
+
+<%= labelled_form_for :git_hook_setting, @git_hook_setting,
+        :url => git_hook_setting_path,
+        :html => {:multipart => true, :id => 'git_hook_setting-form'} do |f| %>
+    <%= render :partial => 'git_hook_settings/form', :locals => {:form => f, :disabled => false} %>
+    <%= f.submit l(:button_save) %>
+    <%= link_to l(:button_cancel), :controller => 'git_hook_settings', :action => 'show', :id => @git_hook_setting.id %>
+<% end %>

@@ -1,0 +1,39 @@
+<div class="contextual">
+  <%= link_to l(:gh_label_git_hook_setting_new), 
+      new_git_hook_setting_path, :class => 'icon icon-add' %>
+</div>
+
+<%= title l(:gh_label_git_hook_setting_plural) %>
+
+<% if (@git_hook_settings.blank?) %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+
+<table class="list git_hook_setting">
+  <thead>
+    <tr>
+      <%= sort_header_tag('id', :caption => '#') %>
+      <%= sort_header_tag('is_enabled', :caption => l(:gh_field_is_enabled)) %>
+      <%= sort_header_tag('title', :caption => l(:gh_field_title)) %>
+      <%= sort_header_tag('project_pattern', :caption => l(:gh_field_project_pattern)) %>
+      <%= sort_header_tag('remark_issue_tracker', :caption => l(:gh_field_remark_issue_tracker)) %>
+      <%= sort_header_tag('remark_issue_closed_status', :caption => l(:gh_field_remark_issue_closed_status)) %>
+      <%= sort_header_tag('keyword_to_resolve_discussion', :caption => l(:gh_field_keyword_to_resolve_discussion)) %>
+    </tr>
+  </thead>
+  <tbody>
+    <% @git_hook_settings.each do |git_hook_setting| %>
+    <tr class="<%= cycle('odd', 'even') %><%= ' disable' unless git_hook_setting.is_enabled %>">
+      <td class="id"><%= link_to git_hook_setting.id, git_hook_setting_path(git_hook_setting.id) %></td>
+      <td class="is_enabled"><%=h git_hook_setting.is_enabled ? l(:general_text_yes) : l(:general_text_no) %></td>
+      <td class="title"><%=h git_hook_setting.title%></td>
+      <td class="project_pattern"><%=h git_hook_setting.project_pattern%></td>
+      <td class="remark_issue_tracker"><%=h git_hook_setting.remark_issue_tracker_label%></td>
+      <td class="remark_issue_closed_status"><%=h git_hook_setting.remark_issue_closed_status_label%></td>
+      <td class="keyword_to_resolve_discussion"><%=h git_hook_setting.keyword_to_resolve_discussion%></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<% end %>
