@@ -172,7 +172,7 @@ module GitHook
       reviewer = find_user(params[:user][:username], params[:user][:email])
 
       project = find_project
-      parent = find_review_issue(project, "merge_request_url", params[:merge_request][:url])
+      parent = find_review_issue(project, "merge_request_url", params[:merge_request][:url], params[:merge_request][:description])
       unless parent.present?
         log_info("Issue to hold a review not found. merge_request_url='#{params[:merge_request][:url]}'")
         return
@@ -252,7 +252,7 @@ module GitHook
       reviewer = find_user(params[:user][:username], params[:user][:email])
 
       project = find_project
-      parent = find_review_issue(project, "merge_request_url", params[:object_attributes][:url])
+      parent = find_review_issue(project, "merge_request_url", params[:object_attributes][:url], params[:object_attributes][:description])
       unless parent.present?
         log_info("Issue to hold a review not found. merge_request_url='#{params[:object_attributes][:url]}'")
         return
@@ -281,9 +281,16 @@ module GitHook
       return reviewer
     end
 
-    def find_review_issue(project, request_keyword, request_url)
-      return Issue.where('project_id = ? AND description like ?',
-        project.id, "%_#{request_keyword}=#{request_url}%").last
+    def find_review_issue(project, request_keyword, request_url, description)
+      issues = Issue.where('project_id = ? AND description like ?',
+        project.id, "%_#{request_keyword}=#{request_url}%")
+      if issues.any?
+        return issues.last
+      else
+        if m = description.match("refs #([0-9]+)")
+          return Issue.find_by_id(m[1])
+        end
+      end
     end
 
     def close_child(reviewer, setting, child, comment)
