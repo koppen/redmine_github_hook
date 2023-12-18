@@ -174,13 +174,21 @@ module GitHook
       project = find_project
       parent = find_review_issue(project, "merge_request_url", params[:merge_request][:url], params[:merge_request][:description])
       unless parent.present?
-        log_info("Issue to hold a review not found. merge_request_url='#{params[:merge_request][:url]}'")
+        log_info("Linked review issue is not found. merge_request_url='#{params[:merge_request][:url]}'")
+        return
+      end
+      if parent.closed?
+        log_info("Linked review issue has been closed. '#{parent}'")
         return
       end
 
       child = Issue.where('project_id = ? AND description like ?',
         project.id, "%_discussion_id=#{params[:object_attributes][:discussion_id]}%").last
       if child.present?
+        child.description = child.description.gsub(/_blocking_discussions_resolved=.*,/,
+          "_blocking_discussions_resolved=#{params[:merge_request][:blocking_discussions_resolved]},")
+        child.description = child.description.gsub(/_type=.*,/, "_type=#{params[:object_attributes][:type]},")
+
         comment = "#{params[:object_attributes][:note]}"
         keyword_to_resolve = setting.keyword_to_resolve_discussion
         if comment.include?(keyword_to_resolve)
@@ -192,24 +200,20 @@ module GitHook
             comment << "---\n\n"
             comment << "\"View on Git\":#{params[:object_attributes][:url]}"
           end
-          close_child(reviewer, setting, child, comment)
+          close_child(reviewer, setting.remark_issue_closed_status, child, comment)
           log_info("Redmine remark issue closed. '#{child}'")
         else
           comment << "\n\n"
           comment << "---\n\n"
           comment << "\"View on Git\":#{params[:object_attributes][:url]}"
-          journal = child.init_journal(reviewer, comment)
-          journal.save
+          child.init_journal(reviewer, comment)
+          child.save
           child.reload
           log_info("Comment '#{params[:object_attributes][:note]}' added to '#{child}'.")
         end
       else
         if params[:merge_request][:state] != "opened"
           log_info("This merge request is not open so no issues can be added. '#{params[:merge_request][:url]}'")
-          return
-        end
-        if parent.closed?
-          log_info("This review issue has been closed so no issues can be added. '#{parent}'")
           return
         end
 
@@ -219,8 +223,9 @@ module GitHook
         description << "---\n\n"
         description << "\"View on Git\":#{params[:object_attributes][:url]} \n\n"
         description << "{{collapse(Please do not edit the following.)\n"
-        description << "_discussion_id=#{params[:object_attributes][:discussion_id]}\n"
-        description << "_blocking_discussions_resolved=#{params[:merge_request][:blocking_discussions_resolved]}\n"
+        description << "_discussion_id=#{params[:object_attributes][:discussion_id]},\n"
+        description << "_type=#{params[:object_attributes][:type]},\n"
+        description << "_blocking_discussions_resolved=#{params[:merge_request][:blocking_discussions_resolved]},\n"
         description << "}} "
         subject = description.partition("\n")[0]
         child = Issue.new(
@@ -254,18 +259,26 @@ module GitHook
       project = find_project
       parent = find_review_issue(project, "merge_request_url", params[:object_attributes][:url], params[:object_attributes][:description])
       unless parent.present?
-        log_info("Issue to hold a review not found. merge_request_url='#{params[:object_attributes][:url]}'")
+        log_info("Linked review issue is not found. merge_request_url='#{params[:object_attributes][:url]}'")
+        return
+      end
+      if parent.closed?
+        log_info("Linked review issue has been closed. '#{parent}'")
         return
       end
 
+      tracker_id = setting.remark_issue_tracker
+      closed_id = setting.remark_issue_closed_status
       if action == "merge"
-        children = find_children(parent, setting, "_blocking_discussions_resolved=")
-        close_children(reviewer, setting, children, "This issue was closed because the merge request was merged.")
+        children = parent.children.where('tracker_id = ? AND status_id != ? AND description like ?',
+          tracker_id, closed_id, "%_blocking_discussions_resolved=%")
+        close_children(reviewer, closed_id, children, "This issue was closed because the merge request was merged.")
       elsif action = "update"
         resolved = params[:object_attributes][:blocking_discussions_resolved]
         if resolved
-          children = find_children(parent, setting, "_blocking_discussions_resolved=false")
-          close_children(reviewer, setting, children, "This issue was closed because all threads are resolved.")
+          children = parent.children.where('tracker_id = ? AND status_id != ? AND (description like ? OR description like ?)',
+            tracker_id, closed_id, "%_blocking_discussions_resolved=false%", "%_type=null%")
+          close_children(reviewer, closed_id, children, "This issue was closed because all threads are resolved.")
         else
           log_info("Some threads has not been resolved.")
         end
@@ -293,25 +306,20 @@ module GitHook
       end
     end
 
-    def close_child(reviewer, setting, child, comment)
+    def close_child(reviewer, closed_id, child, comment)
       child.init_journal(reviewer, comment)
-      child.status_id = setting.remark_issue_closed_status
+      child.status_id = closed_id
       child.save
       child.reload
     end
 
-    def find_children(parent, setting, description)
-      return parent.children.where('tracker_id = ? AND status_id != ? AND description like ?',
-        setting.remark_issue_tracker, setting.remark_issue_closed_status, "%#{description}%")
-    end
-
-    def close_children(reviewer, setting, children, comment)
+    def close_children(reviewer, closed_id, children, comment)
       if children.present? && children.any?
         comment << "\n\n"
         comment << "---\n\n"
         comment << "\"View on Git\":#{params[:object_attributes][:url]}"
         children.each do |child|
-          close_child(reviewer, setting, child, comment)
+          close_child(reviewer, closed_id, child, comment)
         end
         log_info("Redmine remark issue(s) closed. #{children.map { |child| "'#{child}'" }.join(', ')}")
       else
