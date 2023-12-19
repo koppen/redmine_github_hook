@@ -5,7 +5,8 @@
 1. Git と Redmine のリポジトリを同期して Redmine 上で Git のコミットの履歴を参照可能にする
 1. Git の Merge Request に追加されたコメントを自動で Redmine のチケットとして追加する
 
-現在、２に関しては GitLab のみサポートしています。今後、GitHub のサポートも実施予定です。
+現在、２に関しては GitLab のみサポートしています。今後、GitHub のサポートも実施予定です。  
+１に関してはどちらもサポートしています。
 
 ## インストール
 
@@ -31,7 +32,7 @@ $ bundle exec rake redmine:plugins:migrate NAME=redmine_git_hook RAILS_ENV=produ
 
 1. Git で同期したいプロジェクトに「Webhook」を設定する
 
-   1. 以下のように同期させたい Redmine の URL を設定する。
+   1. 以下のように同期させたい Redmine の URL を設定する
 
       http://`[RedmineのURL]`/git_hook?project_id=`[Redmineのプロジェクトの識別子]`  
       例）`http://localhost/git_hook?project_id=plugin`
@@ -118,7 +119,7 @@ Merge Request と Redmine のレビューチケットをリンクさせ、Merge 
 
 ### 使用方法
 
-1. Git の Merge Request と Redmine のレビューチケットの紐づけ
+1. Git の Merge Request と Redmine のレビューチケットの紐づけ[^1]
 
    以下のどちらかのやり方で Merge Request とレビューチケットを紐づける。
 
@@ -130,15 +131,17 @@ Merge Request と Redmine のレビューチケットをリンクさせ、Merge 
 
      1. RedmineTimePuncher の「レビュー」を選択する
      1. 「設定」ダイアログを開き「Gitとの連携」にチェックを入れる
-     1. 「マージリクエストURL」に紐づけたい Merge Request の URL を設定しレビューチケットを作成する
+     1. 「マージリクエストURL」に紐づけたい Merge Request の URL を設定し、レビューチケットを作成する
 
 1. Merge Request でコメントを追加する
 
    - 紐づけたレビューチケットの子チケットとして指摘チケットが作成される
+   - 作成者はコメントを追加した人、担当者はレビューチケットの担当者が設定される[^2]
 
 1. Merge Request のコメントに返信する
 
    - 作成された指摘チケットにコメントが追加される
+   - コメントは Merge Request にコメントした人の名義で追加される
 
 1. Merge Request のコメントに終了用のキーワードを含む返信をする
 
@@ -147,3 +150,7 @@ Merge Request と Redmine のレビューチケットをリンクさせ、Merge 
 1. Merge Request のすべてのスレッドが終了される、もしくはマージされる
 
    - 本プラグインによって作成された指摘チケットをすべて終了する
+
+[^1]: 本プラグインではチケットの説明やコメントに処理用の文字列を追加する場合があります。それらの編集は行わないでください.
+
+[^2]: ユーザの紐づけはログインIDもしくはメールアドレスで実施しています。よってGitとRedmineの設定で、ログインIDもしくはメールアドレスが一致するようにしてください。
