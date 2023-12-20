@@ -50,6 +50,10 @@ $ bundle exec rake redmine:plugins:migrate NAME=redmine_git_hook RAILS_ENV=produ
       ```
       例）`git clone --mirror git@github.com:RedminePower/redmine_git_hook.git`
 
+   1. `git clone` したリポジトリのオーナーを `apache` に変更する
+
+      例）`chown apache:apache redmine_git_hook.git -R`
+
 1. Redmine の同期させたいプロジェクトにて「リポジトリ」の設定を行う
 
    1. プロジェクトの設定画面から「リポジトリ」を選択し「新しいリポジトリ」をクリックする
@@ -57,6 +61,7 @@ $ bundle exec rake redmine:plugins:migrate NAME=redmine_git_hook RAILS_ENV=produ
 
       |項目|内容|
       |---|---|
+      |バージョン管理システム|「Git」を選択|
       |識別子|リポジトリを判別するための任意の文字列|
       |リポジトリのパス|前の手順で `git clone` したリポジトリのパス <br> 例） `/home/apache/repos/redmine_git_hook.git` |
 

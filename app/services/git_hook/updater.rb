@@ -201,7 +201,7 @@ module GitHook
             comment << "\"View on Git\":#{params[:object_attributes][:url]}"
           end
           close_child(reviewer, setting.remark_issue_closed_status, child, comment)
-          log_info("Redmine remark issue closed. '#{child}'")
+          log_info("Redmine indicated issue closed. '#{child}'")
         else
           comment << "\n\n"
           comment << "---\n\n"
@@ -243,7 +243,7 @@ module GitHook
         )
         child.save
         child.reload
-        log_info("Redmine review remark issue added. '#{child}'")
+        log_info("Redmine review indicated issue added. '#{child}'")
       end
     end
 
@@ -321,9 +321,9 @@ module GitHook
         children.each do |child|
           close_child(reviewer, closed_id, child, comment)
         end
-        log_info("Redmine remark issue(s) closed. #{children.map { |child| "'#{child}'" }.join(', ')}")
+        log_info("Redmine indicated issue(s) closed. #{children.map { |child| "'#{child}'" }.join(', ')}")
       else
-        log_info("No remark issues that need to close.")
+        log_info("No indicated issues that need to close.")
       end
     end
 
