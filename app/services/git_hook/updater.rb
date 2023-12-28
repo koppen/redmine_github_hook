@@ -184,6 +184,7 @@ module GitHook
 
       child = Issue.where('project_id = ? AND description like ?',
         project.id, "%_discussion_id=#{params[:object_attributes][:discussion_id]}%").last
+      view_on_git = create_link("View on Git", params[:object_attributes][:url])
       if child.present?
         child.description = child.description.gsub(/_blocking_discussions_resolved=.*,/,
           "_blocking_discussions_resolved=#{params[:merge_request][:blocking_discussions_resolved]},")
@@ -194,18 +195,18 @@ module GitHook
         if comment.include?(keyword_to_resolve)
           comment = comment.gsub!(keyword_to_resolve, "").strip
           if comment.empty?
-            comment = "\"View on Git\":#{params[:object_attributes][:url]}"
+            comment = view_on_git
           else
             comment << "\n\n"
             comment << "---\n\n"
-            comment << "\"View on Git\":#{params[:object_attributes][:url]}"
+            comment << view_on_git
           end
           close_child(reviewer, setting.remark_issue_closed_status, child, comment)
           log_info("Redmine indicated issue closed. '#{child}'")
         else
           comment << "\n\n"
           comment << "---\n\n"
-          comment << "\"View on Git\":#{params[:object_attributes][:url]}"
+          comment << view_on_git
           child.init_journal(reviewer, comment)
           child.save
           child.reload
@@ -221,8 +222,8 @@ module GitHook
         description = "#{params[:object_attributes][:note]}"
         description << "\n\n"
         description << "---\n\n"
-        description << "\"View on Git\":#{params[:object_attributes][:url]} \n\n"
-        description << "{{collapse(Please do not edit the following.)\n"
+        description << "#{view_on_git} \n\n"
+        description << "{{collapse(Please do not edit the followings.)\n"
         description << "_discussion_id=#{params[:object_attributes][:discussion_id]},\n"
         description << "_type=#{params[:object_attributes][:type]},\n"
         description << "_blocking_discussions_resolved=#{params[:merge_request][:blocking_discussions_resolved]},\n"
@@ -303,6 +304,16 @@ module GitHook
         if m = description.match("refs #([0-9]+)")
           return Issue.find_by_id(m[1])
         end
+      end
+    end
+
+    def create_link(header, url)
+      if Setting.text_formatting == "textile"
+        return "\"#{header}\":#{url} "
+      elsif Setting.text_formatting == "markdown"
+        return "[#{header}](#{url}) "
+      else
+        return url
       end
     end
 
