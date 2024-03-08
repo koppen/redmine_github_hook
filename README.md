@@ -18,7 +18,6 @@ If your shared repository is on a remote machine - for example on GitHub - this 
 
 That approach works perfectly fine, but is a bit heavy-handed and cumbersome. The Redmine GitHub Hook plugin allows GitHub to notify your Redmine installation when changes have been pushed to a repository, triggering an update of your local repository and Redmine data only when it is actually necessary.
 
-
 ## Getting started
 
 ### 1. Install the plugin
@@ -52,7 +51,7 @@ That's it. GitHub will now send a HTTP POST to the Redmine GitHub Hook plugin wh
 
 ## Assumptions
 
-* Redmine 2 running on a *nix-like system. Redmine versions before 2.0 should use the redmine_1.x branch.
+* Redmine running on a *nix-like system. Redmine versions before 2.0 should use the redmine_1.x branch. This gem has been reported to work with Redmine version 5.x, 4.x, 3.x., 2.x.
 * Git 1.5 or higher available on the commandline.
 
 
