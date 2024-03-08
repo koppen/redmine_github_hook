@@ -11,11 +11,22 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changes
 
-* Tags deleted on the remote will now be pruned from the local repository when we update it.
+*
 
 ### Removed
 
 *
+
+
+## 3.0.2 (2024-03-08)
+
+### Added
+
+* Support for Redmine 5 (@taikii, @altheali533)
+
+### Changes
+
+* Tags deleted on the remote will now be pruned from the local repository when we update it.
 
 
 ## 3.0.1 (2019-07-30)
